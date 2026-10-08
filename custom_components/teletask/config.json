@@ -1,0 +1,12 @@
+{
+    "teletask": {
+        "ip": "192.168.1.1",
+        "port": 55957
+    },
+    "assets": [
+        {"name": "Garage", "component": "light", "room": "Garage", "icon": "mdi:light-recessed",
+			"teletask" {: "relay", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Bureau", "component": "light", "room": "Bureau", "icon": "mdi:light-recessed",
+			"teletask" {: "relay", "central_unit": 1, "teletask_id": 1}},
+     ]
+}

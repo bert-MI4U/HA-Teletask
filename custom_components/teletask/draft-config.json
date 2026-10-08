@@ -1,0 +1,31 @@
+{
+    "teletask": {
+        "ip": "192.168.1.1",
+        "port": 55957
+    },
+    "assets": [
+        {"name": "Garage", "component": "light", "room": "Garage", "icon": "mdi:light-recessed",
+			"teletask" {: "relay", "central_unit": 1, "teletask_id": 1}},
+       {"name": "Bureau", "component": "light", "room": "Bureau", "icon": "mdi:light-recessed",
+			"teletask" {: "relay", "central_unit": 1, "teletask_id": 1}},
+ 
+        {"name": "Oprit", "component": "light", "teletask_type": "locmood", "central_unit": 1, "teletask_id": 5},
+
+        {"name": "Sauna R", "component": "light", "teletask_type": "dimmer", "central_unit": 1, "teletask_id": 1},
+        {"name": "Sauna G", "component": "light", "teletask_type": "dimmer", "central_unit": 1, "teletask_id": 2},
+        {"name": "Sauna B", "component": "light", "teletask_type": "dimmer", "central_unit": 1, "teletask_id": 3},
+        {"name": "Sauna W", "component": "light", "teletask_type": "dimmer", "central_unit": 1, "teletask_id": 4},
+
+        {"name": "Werkbank 1", "component": "switch", "teletask_type": "relay", "central_unit": 1, "teletask_id": 7},
+        
+        {"name": "TV-kijken", "component": "switch", "teletask_type": "genmood", "central_unit": 1, "teletask_id": 6},
+
+        {"name": "Zomer", "component": "switch", "teletask_type": "flag", "central_unit": 1, "teletask_id": 5},
+
+        {"name": "Screens Weather", "component": "switch", "teletask_type": "process", "central_unit": 1, "teletask_id": 26},
+        
+        {"name": "Regen", "component": "switch", "teletask_type": "cond", "central_unit": 1, "teletask_id": 2},
+
+        {"name": "Living", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C", "teletask_type": "sensor", "central_unit": 1, "teletask_id": 90}
+    ]
+}
