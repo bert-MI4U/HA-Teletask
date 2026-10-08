@@ -5,8 +5,8 @@
     },
     "assets": [
         {"name": "Garage", "component": "light", "device": "TT Garage", "room": "Garage", "icon": "mdi:light-recessed",
-			"teletask" {: "type": "relay", "central_unit": 1, "teletask_id": 1}},
+			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
         {"name": "Bureau", "component": "light", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:light-recessed",
-			"teletask" {: "type": "relay", "central_unit": 1, "teletask_id": 1}},
+			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
      ]
 }
