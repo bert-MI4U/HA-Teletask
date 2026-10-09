@@ -73,7 +73,7 @@ class teletask_api:
             setting = SET_ON if value else SET_OFF
 
         packet = self._build_packet(
-            COMMAND_FUNCTION_SET,
+            COMMAND_SET,
             [
                 tt_cu,
                 function,
@@ -100,7 +100,7 @@ class teletask_api:
         function = self._get_function(tt_type)
 
         packet = self._build_packet(
-            COMMAND_FUNCTION_GET,
+            COMMAND_GET,
             [
                 tt_cu,
                 function,
