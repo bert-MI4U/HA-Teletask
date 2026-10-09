@@ -3,11 +3,11 @@ import asyncio
 from .teletask_const import *
 
 TT_FUNCTIONS = {
-    "relay": FUNCTION_RELAY,
-    "dimmer": FUNCTION_DIMMER,
-    "locmood": FUNCTION_LOCMOOD,
-    "genmood": FUNCTION_GENMOOD,
-    "flag": FUNCTION_FLAG,
+    "relay": FNC_RELAY,
+    "dimmer": FNC_DIMMER,
+    "locmood": FNC_LOCMOOD,
+    "genmood": FNC_GENMOOD,
+    "flag": FNC_FLAG,
 }
 
 class teletask_api:
