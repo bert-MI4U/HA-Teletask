@@ -1,6 +1,6 @@
 import asyncio
 
-from teletask_const import *
+from .teletask_const import *
 
 TT_FUNCTIONS = {
     "relay": FUNCTION_RELAY,
