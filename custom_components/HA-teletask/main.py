@@ -2,7 +2,7 @@ import asyncio
 import json
 
 from teletask_api import teletask_api
-from ha_light import ha_light
+from light_entity import light_entity
 
 
 async def main():
@@ -20,7 +20,7 @@ async def main():
 
     for asset in config["assets"]:
         if asset["component"] == "light":
-            lights.append(ha_light(asset, api))
+            lights.append(light_entity(asset, api))
 
     for light in lights:
         await light.update()
