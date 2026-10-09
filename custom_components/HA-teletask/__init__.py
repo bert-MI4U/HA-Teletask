@@ -1,6 +1,6 @@
 """The Teletask integration."""
 
-DOMAIN = "teletask"
+DOMAIN = "ha_teletask"
 
 
 async def async_setup(hass, config):
