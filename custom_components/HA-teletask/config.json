@@ -1,12 +1,12 @@
 {
     "teletask": {
-        "ip": "192.168.1.1",
+        "ip": "192.168.70.30",
         "port": 55957
     },
     "assets": [
         {"name": "HAT-Garage", "component": "light", "device": "TT Garage", "room": "Garage", "icon": "mdi:light-recessed",
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
         {"name": "HAT-Bureau", "component": "light", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:light-recessed",
-			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}}
+			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 43}}
      ]
 }
