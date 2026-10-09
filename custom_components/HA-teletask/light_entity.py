@@ -52,8 +52,8 @@ class TeletaskLight(LightEntity):
 
     async def async_update(self):
         """Update light state from Teletask."""
-        self._attr_is_on = await self._api.get_state(
-            self._tt_type,
-            self._tt_cu,
-            self._tt_id,
+ #       self._attr_is_on = await self._api.get_state(
+ #           self._tt_type,
+ #           self._tt_cu,
+ #           self._tt_id,
         )

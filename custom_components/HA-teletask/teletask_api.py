@@ -66,6 +66,8 @@ class teletask_api:
     ):
 
         function = self._get_function(tt_type)
+        
+        _LOGGER = logging.getLogger(__name__)
 
         if tt_type == "dimmer":
             setting = int(value)
@@ -83,10 +85,15 @@ class teletask_api:
             ],
         )
 
+        _LOGGER.warning(
+            "TT SEND: %s",
+            " ".join(f"{b:02X}" for b in packet),
+            
         self.writer.write(packet)
         await self.writer.drain()
 
         ack = await self.reader.read(1)
+        print(f"ACK={ack}")
 
         return ack == b"\x0A"
         
