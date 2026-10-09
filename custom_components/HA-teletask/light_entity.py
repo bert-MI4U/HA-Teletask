@@ -1,38 +1,45 @@
-class ha_light:
+from homeassistant.components.light import LightEntity
+
+
+class TeletaskLight(LightEntity):
+    """Representation of a Teletask light."""
+
     def __init__(self, config, api):
-        self.api = api
+        self._api = api
 
-        self.name = config["name"]
-        self.device = config["device"]
-        self.room = config["room"]
-        self.icon = config["icon"]
+        self._attr_name = config["name"]
+        self._attr_icon = config["icon"]
 
-        self.central_unit = config["teletask"]["central_unit"]
-        self.relay_id = config["teletask"]["teletask_id"]
+        self._central_unit = config["teletask"]["central_unit"]
+        self._relay_id = config["teletask"]["teletask_id"]
 
-        self.is_on = False
+        self._attr_is_on = False
 
-    async def update(self):
-        self.is_on = await self.api.get_relay_state(
-            self.central_unit,
-            self.relay_id
+    async def async_turn_on(self, **kwargs):
+        """Turn the light on."""
+        await self._api.set_relay_state(
+            self._central_unit,
+            self._relay_id,
+            True,
         )
 
-        print(
-            f"{self.name}: "
-            f"{'ON' if self.is_on else 'OFF'}"
+        self._attr_is_on = True
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs):
+        """Turn the light off."""
+        await self._api.set_relay_state(
+            self._central_unit,
+            self._relay_id,
+            False,
         )
 
-    async def turn_on(self):
-        await self.api.set_relay_state(
-            self.central_unit,
-            self.relay_id,
-            True
-        )
+        self._attr_is_on = False
+        self.async_write_ha_state()
 
-    async def turn_off(self):
-        await self.api.set_relay_state(
-            self.central_unit,
-            self.relay_id,
-            False
+    async def async_update(self):
+        """Update light state from Teletask."""
+        self._attr_is_on = await self._api.get_relay_state(
+            self._central_unit,
+            self._relay_id,
         )
