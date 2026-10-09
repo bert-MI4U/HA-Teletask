@@ -1,3 +1,5 @@
+import json
+
 from .light_entity import TeletaskLight
 
 
@@ -6,29 +8,24 @@ async def async_setup_entry(
     entry,
     async_add_entities,
 ):
-    async_add_entities(
-        [
-            TeletaskLight(
-                {
-                    "name": "Garage",
-                    "icon": "mdi:garage",
-                    "teletask": {
-                        "central_unit": 1,
-                        "teletask_id": 1,
-                    },
-                },
-                None,
-            ),
-            TeletaskLight(
-                {
-                    "name": "Oprit",
-                    "icon": "mdi:light-flood-down",
-                    "teletask": {
-                        "central_unit": 1,
-                        "teletask_id": 5,
-                    },
-                },
-                None,
-            ),
-        ]
-    )
+
+    with open(
+        "/config/custom_components/ha_teletask/config.json",
+        "r",
+    ) as file:
+        config = json.load(file)
+
+    entities = []
+
+    for asset in config["assets"]:
+
+        if asset["component"] == "light":
+
+            entities.append(
+                TeletaskLight(
+                    asset,
+                    None,
+                )
+            )
+
+    async_add_entities(entities)
