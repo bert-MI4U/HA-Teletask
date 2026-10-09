@@ -46,8 +46,8 @@ class teletask_api:
             self.port
         )
 
-         _LOGGER.info(
-            "Connected to Teletask %s:%s",
+        _LOGGER.info(
+            "TT_Connected to Teletask %s:%s",
             self.host,
             self.port,
         )
@@ -57,7 +57,7 @@ class teletask_api:
             self.writer.close()
             await self.writer.wait_closed()
             
-        _LOGGER.info("Disconnected")
+        _LOGGER.info("TT_Disconnected")
 
     def _build_packet(self, command, parameters):
 
@@ -87,8 +87,6 @@ class teletask_api:
 
         function = self._get_function(tt_type)
         
-        _LOGGER = logging.getLogger(__name__)
-
         if tt_type == "dimmer":
             setting = int(value)
         else:
@@ -105,12 +103,19 @@ class teletask_api:
             ],
         )
 
-        self._log_packet("SEND", packet)
-            
+        _LOGGER.debug(
+            "TT_SET type=%s cu=%s id=%s value=%s",
+            tt_type,
+            tt_cu,
+            tt_id,
+            value,
+        )
+        self._log_packet("TT_SEND", packet)
         self.writer.write(packet)
         await self.writer.drain()
-
         ack = await self.reader.read(1)
+        _LOGGER.debug("TT_ACK %s", ack)
+
         print(f"ACK={ack}")
 
         return ack == b"\x0A"
@@ -134,13 +139,18 @@ class teletask_api:
             ],
         )
 
-        self._log_packet("RECV", packet)
-
+        _LOGGER.debug(
+            "TT_SET type=%s cu=%s id=%s value=%s",
+            tt_type,
+            tt_cu,
+            tt_id,
+            value,
+        )
+        self._log_packet("TT_SEND", packet)
         self.writer.write(packet)
         await self.writer.drain()
-
         ack = await self.reader.read(1)
-
+        _LOGGER.debug("TT_ACK %s", ack)
         if ack != b"\x0A":
             return None
 

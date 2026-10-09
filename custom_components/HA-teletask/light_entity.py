@@ -56,4 +56,4 @@ class TeletaskLight(LightEntity):
  #           self._tt_type,
  #           self._tt_cu,
  #           self._tt_id,
-        )
+ #       )
