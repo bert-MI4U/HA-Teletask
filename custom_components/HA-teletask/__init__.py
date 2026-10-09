@@ -46,3 +46,20 @@ async def async_setup_entry(
     )
 
     return True
+    
+
+async def async_unload_entry(hass, entry):
+    """Unload a config entry."""
+
+    data = hass.data[DOMAIN].pop(entry.entry_id)
+
+    if data.get("api"):
+        await data["api"].disconnect()
+
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry,
+        ["light"],
+    )
+
+    return unload_ok
+    

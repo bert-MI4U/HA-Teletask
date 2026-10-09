@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from .teletask_const import *
 
@@ -10,6 +11,9 @@ TT_FUNCTIONS = {
     "flag": FNC_FLAG,
 }
 
+_LOGGER = logging.getLogger(__name__)
+
+
 class teletask_api:
 
     def __init__(self, host, port):
@@ -19,6 +23,14 @@ class teletask_api:
         self.reader = None
         self.writer = None
     
+    def _log_packet(self, direction, packet):
+
+        _LOGGER.debug(
+            "%s %s",
+            direction,
+            " ".join(f"{b:02X}" for b in packet),
+        )
+
     def _get_function(self, tt_type):
 
         try:
@@ -34,10 +46,18 @@ class teletask_api:
             self.port
         )
 
+         _LOGGER.info(
+            "Connected to Teletask %s:%s",
+            self.host,
+            self.port,
+        )
+
     async def disconnect(self):
         if self.writer:
             self.writer.close()
             await self.writer.wait_closed()
+            
+        _LOGGER.info("Disconnected")
 
     def _build_packet(self, command, parameters):
 
@@ -85,9 +105,7 @@ class teletask_api:
             ],
         )
 
-        _LOGGER.warning(
-            "TT SEND: %s",
-            " ".join(f"{b:02X}" for b in packet),
+        self._log_packet("SEND", packet)
             
         self.writer.write(packet)
         await self.writer.drain()
@@ -115,6 +133,8 @@ class teletask_api:
                 tt_id & 0xFF,
             ],
         )
+
+        self._log_packet("RECV", packet)
 
         self.writer.write(packet)
         await self.writer.drain()
