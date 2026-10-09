@@ -1,5 +1,7 @@
-from homeassistant.components.light import LightEntity
-
+from homeassistant.components.light import (
+    ColorMode,
+    LightEntity,
+)
 
 class TeletaskLight(LightEntity):
     """Representation of a Teletask light."""
@@ -9,6 +11,9 @@ class TeletaskLight(LightEntity):
 
         self._attr_name = config["name"]
         self._attr_icon = config["icon"]
+
+        self._attr_supported_color_modes = {ColorMode.ONOFF}
+        self._attr_color_mode = ColorMode.ONOFF
 
         self._central_unit = config["teletask"]["central_unit"]
         self._relay_id = config["teletask"]["teletask_id"]
