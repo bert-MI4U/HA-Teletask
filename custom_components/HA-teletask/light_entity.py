@@ -11,13 +11,14 @@ class TeletaskLight(LightEntity):
 
         self._attr_name = config["name"]
         self._attr_icon = config["icon"]
-        self._central_unit = config["teletask"]["central_unit"]
-        self._relay_id = config["teletask"]["teletask_id"]
+        self._tt_type = config["teletask"]["type"]
+        self._tt_cu = config["teletask"]["central_unit"]
+        self._tt_id = config["teletask"]["teletask_id"]
         self._attr_unique_id = (
             f"ha_teletask_"
-            f"{config['teletask']['type']}_"
-            f"{self._central_unit}_"
-            f"{self._relay_id}"
+            f"{self._tt_type}_"
+            f"{self._tt_cu}_"
+            f"{self._tt_id}"
         )
 
         self._attr_supported_color_modes = {ColorMode.ONOFF}
@@ -27,9 +28,10 @@ class TeletaskLight(LightEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn the light on."""
-        await self._api.set_relay_state(
-            self._central_unit,
-            self._relay_id,
+        await self._api.set_state(
+            self._tt_type,
+            self._tt_cu,
+            self._tt_id,
             True,
         )
 
@@ -38,9 +40,10 @@ class TeletaskLight(LightEntity):
 
     async def async_turn_off(self, **kwargs):
         """Turn the light off."""
-        await self._api.set_relay_state(
-            self._central_unit,
-            self._relay_id,
+        await self._api.set_state(
+            self._tt_type,
+            self._tt_cu,
+            self._tt_id,
             False,
         )
 
@@ -49,7 +52,8 @@ class TeletaskLight(LightEntity):
 
     async def async_update(self):
         """Update light state from Teletask."""
-        self._attr_is_on = await self._api.get_relay_state(
-            self._central_unit,
-            self._relay_id,
+        self._attr_is_on = await self._api.get_state(
+            self._tt_type,
+            self._tt_cu,
+            self._tt_id,
         )

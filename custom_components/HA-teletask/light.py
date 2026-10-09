@@ -1,5 +1,3 @@
-import json
-
 from .light_entity import TeletaskLight
 
 
@@ -8,12 +6,10 @@ async def async_setup_entry(
     entry,
     async_add_entities,
 ):
+    data = hass.data["ha_teletask"][entry.entry_id]
 
-    with open(
-        "/config/custom_components/ha_teletask/config.json",
-        "r",
-    ) as file:
-        config = json.load(file)
+    api = data["api"]
+    config = data["config"]
 
     entities = []
 
@@ -24,7 +20,7 @@ async def async_setup_entry(
             entities.append(
                 TeletaskLight(
                     asset,
-                    None,
+                    api,
                 )
             )
 

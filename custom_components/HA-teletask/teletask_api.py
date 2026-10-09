@@ -2,6 +2,14 @@ import asyncio
 
 from teletask_const import *
 
+TT_FUNCTIONS = {
+    "relay": FUNCTION_RELAY,
+    "dimmer": FUNCTION_DIMMER,
+    "locmood": FUNCTION_LOCMOOD,
+    "genmood": FUNCTION_GENMOOD,
+    "flag": FUNCTION_FLAG,
+}
+
 class teletask_api:
 
     def __init__(self, host, port):
@@ -10,7 +18,16 @@ class teletask_api:
 
         self.reader = None
         self.writer = None
+    
+    def _get_function(self, tt_type):
 
+        try:
+            return TT_FUNCTIONS[tt_type.lower()]
+        except KeyError:
+            raise ValueError(
+                f"Unsupported Teletask type: {tt_type}"
+            )
+        
     async def connect(self):
         self.reader, self.writer = await asyncio.open_connection(
             self.host,
@@ -40,24 +57,30 @@ class teletask_api:
 
         return bytes(packet)
 
-    async def set_relay_state(
+    async def set_state(
         self,
-        central_unit,
-        relay_id,
-        state
+        tt_type,
+        tt_cu,
+        tt_id,
+        value,
     ):
 
-        setting = SET_ON if state else SET_OFF
+        function = self._get_function(tt_type)
+
+        if tt_type == "dimmer":
+            setting = int(value)
+        else:
+            setting = SET_ON if value else SET_OFF
 
         packet = self._build_packet(
             COMMAND_FUNCTION_SET,
             [
-                central_unit,
-                FUNCTION_RELAY,
-                (relay_id >> 8) & 0xFF,
-                relay_id & 0xFF,
-                setting
-            ]
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
+                setting,
+            ],
         )
 
         self.writer.write(packet)
@@ -65,22 +88,25 @@ class teletask_api:
 
         ack = await self.reader.read(1)
 
-        return ack == b'\x0A'
-
-    async def get_relay_state(
+        return ack == b"\x0A"
+        
+    async def get_state(
         self,
-        central_unit,
-        relay_id
+        tt_type,
+        tt_cu,
+        tt_id,
     ):
+
+        function = self._get_function(tt_type)
 
         packet = self._build_packet(
             COMMAND_FUNCTION_GET,
             [
-                central_unit,
-                FUNCTION_RELAY,
-                (relay_id >> 8) & 0xFF,
-                relay_id & 0xFF
-            ]
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
+            ],
         )
 
         self.writer.write(packet)
@@ -88,7 +114,7 @@ class teletask_api:
 
         ack = await self.reader.read(1)
 
-        if ack != b'\x0A':
+        if ack != b"\x0A":
             return None
 
-        return True
+        return None
