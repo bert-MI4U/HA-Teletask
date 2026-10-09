@@ -93,10 +93,11 @@ SET_CLOSED = 2      #(For a long press)
 SET_OPENED = 3      #(For the end of a long press)
 SENS_MAX = 0x3F00   #(the maximum possible value for a sensor
 
+STX = 0x02
 COMMAND_LOG = 0x03
 COMMAND_GET = 0x06
 COMMAND_SET = 0x07
 COMMAND_REPORT = 0x10
+COMMAND_ACK = 0x0A
 COMMAND_KEEP_ALIVE = 0x0B
 
-COMMAND_ACK = 0x0A
