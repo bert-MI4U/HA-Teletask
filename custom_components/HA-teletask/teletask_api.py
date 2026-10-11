@@ -63,7 +63,12 @@ class teletask_api:
             )
         )
 
-        _LOGGER.warning("TT_CONNECTED")
+        _LOGGER.warning(
+            "TT_CONNECT %s:%s",
+            self.host,
+            self.port,
+        )
+
 
     async def _read_loop(self):
         buffer = bytearray()
@@ -149,6 +154,12 @@ class teletask_api:
 
         checksum = sum(packet) & 0xFF
         packet.append(checksum)
+
+        _LOGGER.warning(
+            "TT_BUILD len=%s checksum=%02X",
+            length,
+            checksum,
+        )
 
         return bytes(packet)
 
