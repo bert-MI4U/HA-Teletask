@@ -53,16 +53,6 @@ class teletask_api:
             self._read_loop()
         )
 
-        await self._send(
-            self._build_packet(
-                COMMAND_LOG,
-                [
-                    FNC_RELAY,
-                    SET_ON,
-                ],
-            )
-        )
-
         _LOGGER.warning(
             "TT_CONNECT %s:%s",
             self.host,
