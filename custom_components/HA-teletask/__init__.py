@@ -3,6 +3,8 @@
 import json
 import logging
 
+_LOGGER = logging.getLogger(__name__)
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .teletask_api import teletask_api
@@ -20,7 +22,8 @@ async def async_setup_entry(
     entry: ConfigEntry,
 ) -> bool:
 
-    _LOGGER.warning("TT_integration_started")
+    _LOGGER.warning("TT_warning_integration_started")
+    _LOGGER.error("TT_error_integration_started")
     
     hass.data.setdefault(DOMAIN, {})
 

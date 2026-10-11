@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+_LOGGER = logging.getLogger(__name__)
+
 from .teletask_const import *
 
 TT_FUNCTIONS = {
@@ -11,7 +13,6 @@ TT_FUNCTIONS = {
     "flag": FNC_FLAG,
 }
 
-_LOGGER = logging.getLogger(__name__)
 
 
 class teletask_api:
@@ -45,7 +46,6 @@ class teletask_api:
             self.host,
             self.port
         )
-        _LOGGER.warning("TT_test_logging")
         
         _LOGGER.info(
             "TT_Connected to Teletask %s:%s",
