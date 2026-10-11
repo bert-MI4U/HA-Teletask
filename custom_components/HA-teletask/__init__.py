@@ -22,8 +22,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
 ) -> bool:
 
-    _LOGGER.warning("TT_warning_integration_started")
-    _LOGGER.error("TT_error_integration_started")
+    _LOGGER.info("TT_info_integration_started")
     
     hass.data.setdefault(DOMAIN, {})
 

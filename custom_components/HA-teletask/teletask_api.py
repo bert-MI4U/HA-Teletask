@@ -26,7 +26,7 @@ class teletask_api:
     
     def _log_packet(self, direction, packet):
 
-        _LOGGER.debug(
+        _LOGGER.warning(
             "%s %s",
             direction,
             " ".join(f"{b:02X}" for b in packet),
@@ -47,7 +47,7 @@ class teletask_api:
             self.port
         )
         
-        _LOGGER.info(
+        _LOGGER.warning(
             "TT_Connected to Teletask %s:%s",
             self.host,
             self.port,
@@ -58,7 +58,7 @@ class teletask_api:
             self.writer.close()
             await self.writer.wait_closed()
             
-        _LOGGER.info("TT_Disconnected")
+        _LOGGER.warning("TT_Disconnected")
 
     def _build_packet(self, command, parameters):
 
@@ -104,7 +104,7 @@ class teletask_api:
             ],
         )
 
-        _LOGGER.debug(
+        _LOGGER.warning(
             "TT_SET type=%s cu=%s id=%s value=%s",
             tt_type,
             tt_cu,
@@ -115,7 +115,7 @@ class teletask_api:
         self.writer.write(packet)
         await self.writer.drain()
         ack = await self.reader.read(1)
-        _LOGGER.debug("TT_ACK %s", ack)
+        _LOGGER.warning("TT_ACK %s", ack)
 
         print(f"ACK={ack}")
 
@@ -140,12 +140,11 @@ class teletask_api:
             ],
         )
 
-        _LOGGER.debug(
+        _LOGGER.warning(
             "TT_SET type=%s cu=%s id=%s value=%s",
             tt_type,
             tt_cu,
             tt_id,
-            value,
         )
         self._log_packet("TT_SEND", packet)
         self.writer.write(packet)
