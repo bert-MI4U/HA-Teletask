@@ -1,6 +1,7 @@
 """HA-Teletask integration."""
 
 import json
+import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -19,6 +20,8 @@ async def async_setup_entry(
     entry: ConfigEntry,
 ) -> bool:
 
+    _LOGGER.warning("TT_integration_started")
+    
     hass.data.setdefault(DOMAIN, {})
 
     with open(
