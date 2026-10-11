@@ -45,7 +45,8 @@ class teletask_api:
             self.host,
             self.port
         )
-
+        _LOGGER.warning("TT_test_logging")
+        
         _LOGGER.info(
             "TT_Connected to Teletask %s:%s",
             self.host,
