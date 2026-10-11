@@ -15,15 +15,17 @@ TT_FUNCTIONS = {
 
 
 
-class teletask_api:
-
+class TeletaskApi:
     def __init__(self, host, port):
         self.host = host
         self.port = port
 
         self.reader = None
         self.writer = None
-    
+
+        self._ack_waiter = None
+        self._reader_task = None
+        
     def _log_packet(self, direction, packet):
 
         _LOGGER.warning(
@@ -44,14 +46,83 @@ class teletask_api:
     async def connect(self):
         self.reader, self.writer = await asyncio.open_connection(
             self.host,
-            self.port
-        )
-        
-        _LOGGER.warning(
-            "TT_Connected to Teletask %s:%s",
-            self.host,
             self.port,
         )
+
+        self._reader_task = asyncio.create_task(
+            self._read_loop()
+        )
+
+        _LOGGER.warning("TT_CONNECTED")
+
+    await self._send(
+        self._build_packet(
+            COMMAND_LOG,
+            [
+                FNC_RELAY,
+                SET_ON,
+            ],
+        )
+    )
+
+    async def _read_loop(self):
+        while True:
+            data = await self.reader.read(100)
+
+            if not data:
+                _LOGGER.warning("TT_SOCKET_CLOSED")
+                return
+
+            for byte in data:
+
+                if byte == 0x0A:
+                    if self._ack_waiter:
+                        self._ack_waiter.set()
+                    continue
+
+                # TODO:
+                # accumulate packet bytes
+                # parse Event Report (0x10)
+                # dispatch callbacks
+
+
+    async def _send(self, packet):
+
+        self._ack_waiter = asyncio.Event()
+
+        self.writer.write(packet)
+        await self.writer.drain()
+
+        try:
+            await asyncio.wait_for(
+                self._ack_waiter.wait(),
+                timeout=1.0,
+            )
+
+            _LOGGER.warning("TT_ACK_OK")
+
+        except asyncio.TimeoutError:
+            _LOGGER.warning("TT_ACK_TIMEOUT")
+
+        finally:
+            self._ack_waiter = None
+
+    async def set_state(...):
+
+        packet = self._build_packet(
+            COMMAND_SET,
+            [
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
+                setting,
+            ],
+        )
+
+        await self._send(packet)
+
+
 
     async def disconnect(self):
         if self.writer:
