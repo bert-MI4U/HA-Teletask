@@ -15,7 +15,7 @@ TT_FUNCTIONS = {
 
 
 
-class TeletaskApi:
+class teletask_api:
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -53,19 +53,21 @@ class TeletaskApi:
             self._read_loop()
         )
 
+        await self._send(
+            self._build_packet(
+                COMMAND_LOG,
+                [
+                    FNC_RELAY,
+                    SET_ON,
+                ],
+            )
+        )
+
         _LOGGER.warning("TT_CONNECTED")
 
-    await self._send(
-        self._build_packet(
-            COMMAND_LOG,
-            [
-                FNC_RELAY,
-                SET_ON,
-            ],
-        )
-    )
-
     async def _read_loop(self):
+        buffer = bytearray()
+
         while True:
             data = await self.reader.read(100)
 
@@ -73,13 +75,30 @@ class TeletaskApi:
                 _LOGGER.warning("TT_SOCKET_CLOSED")
                 return
 
-            for byte in data:
+            buffer.extend(data)
 
-                if byte == 0x0A:
+            while buffer:
+
+                # ACK
+                if buffer[0] == 0x0A:
                     if self._ack_waiter:
                         self._ack_waiter.set()
+                    del buffer[0]
                     continue
 
+                # need STX + LEN
+                if len(buffer) < 2:
+                    break
+
+                if buffer[0] != 0x02:
+                    _LOGGER.warning(
+                        "TT_DROP %02X",
+                        buffer[0]
+                    )
+                    del buffer[0]
+                    continue
+
+                
                 # TODO:
                 # accumulate packet bytes
                 # parse Event Report (0x10)
@@ -107,23 +126,7 @@ class TeletaskApi:
         finally:
             self._ack_waiter = None
 
-    async def set_state(...):
-
-        packet = self._build_packet(
-            COMMAND_SET,
-            [
-                tt_cu,
-                function,
-                tt_id >> 8,
-                tt_id & 0xFF,
-                setting,
-            ],
-        )
-
-        await self._send(packet)
-
-
-
+ 
     async def disconnect(self):
         if self.writer:
             self.writer.close()
@@ -183,14 +186,9 @@ class TeletaskApi:
             value,
         )
         self._log_packet("TT_SEND", packet)
-        self.writer.write(packet)
-        await self.writer.drain()
-        ack = await self.reader.read(1)
-        _LOGGER.warning("TT_ACK %s", ack)
+        await self._send(packet)
+        return True
 
-        print(f"ACK={ack}")
-
-        return ack == b"\x0A"
         
     async def get_state(
         self,
@@ -218,11 +216,6 @@ class TeletaskApi:
             tt_id,
         )
         self._log_packet("TT_SEND", packet)
-        self.writer.write(packet)
-        await self.writer.drain()
-        ack = await self.reader.read(1)
-        _LOGGER.debug("TT_ACK %s", ack)
-        if ack != b"\x0A":
-            return None
+        await self._send(packet)
 
         return None
