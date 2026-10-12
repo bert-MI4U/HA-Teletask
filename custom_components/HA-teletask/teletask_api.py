@@ -101,6 +101,14 @@ class teletask_api:
 
             if not data:
                 _LOGGER.warning("TT_SOCKET_CLOSED")
+
+                self.reader = None
+
+                if self.writer:
+                    self.writer.close()
+
+                self.writer = None
+
                 return
 
             buffer.extend(data)
@@ -182,6 +190,11 @@ class teletask_api:
                 "TT_SEND",
                 packet,
             )
+
+            if self.writer is None:
+                raise ConnectionError(
+                    "Teletask socket not connected"
+                )
 
             self.writer.write(packet)
             await self.writer.drain()
