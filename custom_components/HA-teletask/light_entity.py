@@ -40,6 +40,13 @@ class TeletaskLight(LightEntity):
         self._attr_is_on = new_state
         self.async_write_ha_state()
 
+    async def async_added_to_hass(self):
+        await self._api.request_state(
+            self._tt_type,
+            self._tt_cu,
+            self._tt_id,
+        )
+
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(
             self._tt_type,

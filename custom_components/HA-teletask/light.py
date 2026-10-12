@@ -1,5 +1,7 @@
 from .light_entity import TeletaskLight
+import logging
 
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass,
@@ -21,6 +23,10 @@ async def async_setup_entry(
                 api,
             )
 
+            _LOGGER.debug(
+                "TT_ADD_ENTITY %s",
+                asset["name"],
+            )
             entities.append(entity)
 
             api.register_listener(
