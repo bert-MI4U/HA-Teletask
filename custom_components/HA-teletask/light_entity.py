@@ -14,7 +14,16 @@ class TeletaskLight(LightEntity):
 
         self._attr_name = config["name"]
         self._attr_icon = config["icon"]
-
+        self._tt_type = config["teletask"]["type"]
+        self._tt_cu = config["teletask"]["central_unit"]
+        self._tt_id = config["teletask"]["teletask_id"]
+        self._attr_unique_id = (
+            f"ha_teletask_"
+            f"{self._tt_type}_"
+            f"{self._tt_cu}_"
+            f"{self._tt_id}"
+        )
+        
         self._attr_supported_color_modes = {
             ColorMode.ONOFF
         }

@@ -104,9 +104,12 @@ class teletask_api:
             self._reader_task.cancel()
 
         if self.writer:
-            self.writer.close()
-            await self.writer.wait_closed()
-
+            try:
+                self.writer.close()
+                await self.writer.wait_closed()
+            except ConnectionResetError:
+                pass
+        
         _LOGGER.warning("TT_DISCONNECTED")
 
     async def _keepalive_loop(self):
