@@ -35,7 +35,7 @@ class teletask_api:
         return TT_FUNCTIONS[tt_type.lower()]
 
     def _log_packet(self, direction, packet):
-        _LOGGER.info(
+        _LOGGER.debug(
             "%s %s",
             direction,
             " ".join(f"{b:02X}" for b in packet),
@@ -127,7 +127,7 @@ class teletask_api:
 
     async def _read_loop(self):
 
-        _LOGGER.info(
+        _LOGGER.debug(
             "TT_READ_LOOP_Started",
             data,
         )
@@ -139,14 +139,14 @@ class teletask_api:
             try:
                 data = await self.reader.read(100)
 
-                _LOGGER.info(
-                    "TT_READ_RAW %r",
+                _LOGGER.debug(
+                    "TT_READLOOP_RAW %r",
                     data,
                 )
 
             except Exception as err:
                 _LOGGER.exception(
-                    "TT_READ_EXCEPTION %s",
+                    "TT_READLOOP_EXCEPTION %s",
                     err,
                 )
                 raise
@@ -199,7 +199,7 @@ class teletask_api:
 
     async def _process_packet(self, packet):
 
-        _LOGGER.info(
+        _LOGGER.debug(
             "TT_LISTENERS=%s",
             len(self._listeners),
         )
@@ -214,7 +214,7 @@ class teletask_api:
         tt_id = (packet[5] << 8) + packet[6]
         tt_state = packet[8]
 
-        _LOGGER.info(
+        _LOGGER.debug(
             "TT_REPORT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
             tt_cu,
             tt_type,
@@ -226,7 +226,7 @@ class teletask_api:
             self.writer.write(bytes([COMMAND_ACK]))
             await self.writer.drain()
 
-        _LOGGER.warning("BEFORE_CALLBACK")
+        _LOGGER.debug("BEFORE_CALLBACK")
         
         if self._event_callback:
             await self._event_callback(
@@ -236,10 +236,10 @@ class teletask_api:
                 tt_state,
             )
             
-        _LOGGER.warning("BEFORE_LISTENERS")
+        _LOGGER.debug("BEFORE_LISTENERS")
         
         for listener in self._listeners:
-            _LOGGER.warning(
+            _LOGGER.info(
                 "CALLING_LISTENER %s",
                 listener,
             )
@@ -275,7 +275,7 @@ class teletask_api:
                     timeout=1.0,
                 )
 
-                _LOGGER.info(
+                _LOGGER.debug(
                     "TT_ACK_OK"
                 )
 
