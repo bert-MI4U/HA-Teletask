@@ -64,6 +64,16 @@ class teletask_api:
             self.host,
             self.port,
         )
+        
+        packet = self._build_packet(
+            COMMAND_LOG,
+            [
+                FNC_RELAY,
+                SET_ON,
+            ],
+        )
+
+await self._send(packet)
 
     async def disconnect(self):
 
@@ -174,7 +184,10 @@ class teletask_api:
                 fnc,
                 nr,
             )
-
+            _LOGGER.warning(
+                "TT_REPORT_RAW %s",
+                " ".join(f"{b:02X}" for b in packet),
+            )
             if self.writer:
                 self.writer.write(
                     bytes([COMMAND_ACK])
