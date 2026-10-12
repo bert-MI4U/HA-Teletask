@@ -127,6 +127,11 @@ class teletask_api:
 
     async def _read_loop(self):
 
+        _LOGGER.info(
+            "TT_READ_LOOP_Started",
+            data,
+        )
+
         buffer = bytearray()
 
         while True:
