@@ -128,6 +128,11 @@ class teletask_api:
 
         buffer = bytearray()
 
+        _LOGGER.warning(
+            "TT_READ_RAW %s",
+            data,
+        )
+
         while True:
 
             try:
