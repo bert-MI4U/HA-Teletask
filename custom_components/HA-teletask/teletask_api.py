@@ -86,6 +86,15 @@ class teletask_api:
             self.port,
         )
         
+        _LOGGER.warning(
+            "TT_ENABLE_RELAY_LOG"
+        )
+
+        await self.function_log(
+            FNC_RELAY,
+            SET_ON,
+        )
+        
     async def request_state(
         self,
         tt_type,
@@ -107,6 +116,27 @@ class teletask_api:
         )
 
         await self._send(packet) 
+
+    async def function_log(
+        self,
+        tt_type,
+        tt_state,
+    ):
+        _LOGGER.warning(
+            "TT_FUNCTION_LOG fnc=%s state=%s",
+            tt_type,
+            tt_state,
+        )
+
+        packet = self._build_packet(
+            COMMAND_LOG,
+            [
+                tt_type,
+                tt_state,
+            ],
+        )
+
+        await self._send(packet)
 
     async def disconnect(self):
 
