@@ -17,18 +17,26 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True
 
 async def handle_teletask_event(
-    cu,
-    fnc,
-    nr,
-    state,
+    hass,
+    tt_cu,
+    tt_type,
+    tt_id,
+    tt_state,
 ):
     _LOGGER.warning(
-        "TT_EVENT cu=%s fnc=%s nr=%s state=%s",
-        cu,
-        fnc,
-        nr,
-        state,
+        "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
+        tt_cu,
+        tt_type,
+        tt_id,
+        tt_state,
     )
+
+    hass.data[DOMAIN]["last_event"] = {
+        "tt_cu": tt_cu,
+        "tt_type": tt_type,
+        "tt_id": tt_id,
+        "tt_state": tt_state,
+    }
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -51,8 +59,17 @@ async def async_setup_entry(
         config["teletask"]["port"],
     )
     
-    api._event_callback = handle_teletask_event
-
+    api._event_callback = (
+        lambda tt_cu, tt_type, tt_id, tt_state:
+            handle_teletask_event(
+                hass,
+                tt_cu,
+                tt_type,
+                tt_id,
+                tt_state,
+            )
+    )
+    
     await api.connect()
 
     hass.data[DOMAIN][entry.entry_id] = {

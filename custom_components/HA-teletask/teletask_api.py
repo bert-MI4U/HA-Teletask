@@ -28,12 +28,14 @@ class teletask_api:
         self._keepalive_task = None
         self._send_lock = asyncio.Lock()
         self._event_callback = None
+        self._listeners = []
+
 
     def _get_function(self, tt_type):
         return TT_FUNCTIONS[tt_type.lower()]
 
     def _log_packet(self, direction, packet):
-        _LOGGER.warning(
+        _LOGGER.info(
             "%s %s",
             direction,
             " ".join(f"{b:02X}" for b in packet),
@@ -45,6 +47,12 @@ class teletask_api:
     def _verify_checksum(self, msg):
         return self._checksum(msg[:-1]) == msg[-1]
 
+    def register_listener(
+        self,
+        listener,
+    ):
+        self._listeners.append(listener)
+    
     async def connect(self):
 
         self.reader, self.writer = await asyncio.open_connection(
@@ -60,7 +68,7 @@ class teletask_api:
             self._keepalive_loop()
         )
 
-        _LOGGER.warning(
+        _LOGGER.info(
             "TT_CONNECTED %s:%s",
             self.host,
             self.port,
@@ -122,7 +130,7 @@ class teletask_api:
             try:
                 data = await self.reader.read(100)
 
-                _LOGGER.warning(
+                _LOGGER.info(
                     "TT_READ_RAW %r",
                     data,
                 )
@@ -187,18 +195,17 @@ class teletask_api:
         if command != COMMAND_REPORT:
             return
 
-        cu = packet[3]
-        fnc = packet[4]
-        nr = (packet[5] << 8) + packet[6]
+        tt_cu = packet[3]
+        tt_type = packet[4]
+        tt_id = (packet[5] << 8) + packet[6]
+        tt_state = packet[8]
 
-        state = packet[8]
-
-        _LOGGER.warning(
-            "TT_REPORT cu=%s fnc=%s id=%s state=%s",
-            cu,
-            fnc,
-            nr,
-            state,
+        _LOGGER.info(
+            "TT_REPORT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
+            tt_cu,
+            tt_type,
+            tt_id,
+            tt_state,
         )
 
         if self.writer:
@@ -207,10 +214,18 @@ class teletask_api:
 
         if self._event_callback:
             await self._event_callback(
-                cu,
-                fnc,
-                nr,
-                state,
+                tt_cu,
+                tt_type,
+                tt_id,
+                tt_state,
+            )
+            
+        for listener in self._listeners:
+            listener(
+                tt_cu,
+                tt_type,
+                tt_id,
+                tt_state,
             )
 
     async def _send(self, packet):
@@ -238,7 +253,7 @@ class teletask_api:
                     timeout=1.0,
                 )
 
-                _LOGGER.warning(
+                _LOGGER.info(
                     "TT_ACK_OK"
                 )
 
@@ -307,28 +322,3 @@ class teletask_api:
         await self._send(packet)
 
         return True
-
-    async def get_state(
-        self,
-        tt_type,
-        tt_cu,
-        tt_id,
-    ):
-
-        function = self._get_function(
-            tt_type
-        )
-
-        packet = self._build_packet(
-            COMMAND_GET,
-            [
-                tt_cu,
-                function,
-                tt_id >> 8,
-                tt_id & 0xFF,
-            ],
-        )
-
-        await self._send(packet)
-
-        return None

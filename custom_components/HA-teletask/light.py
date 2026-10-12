@@ -14,14 +14,17 @@ async def async_setup_entry(
     entities = []
 
     for asset in config["assets"]:
-
         if asset["component"] == "light":
 
-            entities.append(
-                TeletaskLight(
-                    asset,
-                    api,
-                )
+            entity = TeletaskLight(
+                asset,
+                api,
+            )
+
+            entities.append(entity)
+
+            api.register_listener(
+                entity.handle_event
             )
 
     async_add_entities(entities)
