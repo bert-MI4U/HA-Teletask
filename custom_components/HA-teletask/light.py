@@ -29,6 +29,12 @@ async def async_setup_entry(
             )
             entities.append(entity)
 
+            _LOGGER.warning(
+                "REGISTER %s id=%s",
+                entity._attr_name,
+                entity._tt_id,
+            )
+
             api.register_listener(
                 entity.handle_event
             )

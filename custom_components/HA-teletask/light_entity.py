@@ -39,7 +39,7 @@ class TeletaskLight(LightEntity):
     ):
 
         _LOGGER.warning(
-            "ENTITY_EVENT %s id=%s state=%s",
+            "ENTITY_EVENT %s %s %s",
             self._attr_name,
             tt_id,
             tt_state,
