@@ -86,7 +86,7 @@ class teletask_api:
             self.port,
         )
         
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_ENABLE_RELAY_LOG"
         )
 
@@ -122,7 +122,7 @@ class teletask_api:
         tt_type,
         tt_state,
     ):
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_FUNCTION_LOG fnc=%s state=%s",
             tt_type,
             tt_state,
@@ -265,7 +265,7 @@ class teletask_api:
             self.writer.write(bytes([COMMAND_ACK]))
             await self.writer.drain()
 
-        _LOGGER.debug("BEFORE_CALLBACK")
+        _LOGGER.debug("TT_BEFORE_CALLBACK")
         
         if self._event_callback:
             try:
@@ -280,11 +280,11 @@ class teletask_api:
                     "TT_EVENT_CALLBACK_FAILED"
                 )
             
-        _LOGGER.debug("BEFORE_LISTENERS")
+        _LOGGER.debug("TT_BEFORE_LISTENERS")
         
         for listener in self._listeners:
-            _LOGGER.info(
-                "CALLING_LISTENER %s",
+            _LOGGER.debug(
+                "TT_CALLING_LISTENER %s",
                 listener,
             )
             try:

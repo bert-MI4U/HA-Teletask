@@ -28,9 +28,9 @@ async def handle_teletask_event(
     tt_id,
     tt_state,
 ):
-    _LOGGER.warning("IN_INIT_CALLBACK")
+    _LOGGER.debug("TT_IN_INIT_CALLBACK")
 
-    _LOGGER.warning(
+    _LOGGER.debug(
         "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
         tt_cu,
         tt_type,
@@ -50,7 +50,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
 ) -> bool:
 
-    _LOGGER.info("TT_info_integration_started")
+    _LOGGER.info("TT_integration_started")
     
     hass.data.setdefault(DOMAIN, {})
 

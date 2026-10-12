@@ -41,8 +41,8 @@ class TeletaskLight(LightEntity):
         tt_state,
     ):
 
-        _LOGGER.warning(
-            "ENTITY_EVENT %s %s %s",
+        _LOGGER.debug(
+            "TT_ENTITY_EVENT %s %s %s",
             self._attr_name,
             tt_id,
             tt_state,
@@ -62,7 +62,7 @@ class TeletaskLight(LightEntity):
             self._attr_is_on,
         )
         if new_state == self._attr_is_on:
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "TT_HANDLE_NO_CHANGE %s state=%s current=%s",
                 self._attr_name,
                 tt_state,
@@ -71,8 +71,8 @@ class TeletaskLight(LightEntity):
             return
             
         self._attr_is_on = new_state
-        _LOGGER.warning(
-            "ENTITY_UPDATE %s -> %s",
+        _LOGGER.debug(
+            "TT_ENTITY_UPDATE %s -> %s",
             self._attr_name,
             self._attr_is_on,
         )

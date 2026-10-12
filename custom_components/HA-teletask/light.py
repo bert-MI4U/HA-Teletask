@@ -23,13 +23,13 @@ async def async_setup_entry(
                 api,
             )
 
-            _LOGGER.debug(
+            _LOGGER.info(
                 "TT_ADD_ENTITY %s",
                 asset["name"],
             )
             entities.append(entity)
 
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "REGISTER %s id=%s",
                 entity._attr_name,
                 entity._tt_id,
