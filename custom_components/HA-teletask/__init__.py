@@ -16,6 +16,19 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})
     return True
 
+async def handle_teletask_event(
+    cu,
+    fnc,
+    nr,
+    state,
+):
+    _LOGGER.warning(
+        "TT_EVENT cu=%s fnc=%s nr=%s state=%s",
+        cu,
+        fnc,
+        nr,
+        state,
+    )
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -37,6 +50,8 @@ async def async_setup_entry(
         config["teletask"]["ip"],
         config["teletask"]["port"],
     )
+    
+    api._event_callback = handle_teletask_event
 
     await api.connect()
 

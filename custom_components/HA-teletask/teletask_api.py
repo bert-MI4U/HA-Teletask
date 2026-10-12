@@ -27,6 +27,7 @@ class teletask_api:
         self._reader_task = None
         self._keepalive_task = None
         self._send_lock = asyncio.Lock()
+        self._event_callback = None
 
     def _get_function(self, tt_type):
         return TT_FUNCTIONS[tt_type.lower()]
@@ -65,15 +66,26 @@ class teletask_api:
             self.port,
         )
         
+    async def request_state(
+        self,
+        tt_type,
+        tt_cu,
+        tt_id,
+    ):
+
+        function = self._get_function(tt_type)
+
         packet = self._build_packet(
-            COMMAND_LOG,
+            COMMAND_GET,
             [
-                FNC_RELAY,
-                SET_ON,
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
             ],
         )
 
-        await self._send(packet)
+        await self._send(packet) 
 
     async def disconnect(self):
 
@@ -172,27 +184,34 @@ class teletask_api:
 
         command = packet[2]
 
-        if command == COMMAND_REPORT:
+        if command != COMMAND_REPORT:
+            return
 
-            cu = packet[3]
-            fnc = packet[4]
-            nr = (packet[5] << 8) + packet[6]
+        cu = packet[3]
+        fnc = packet[4]
+        nr = (packet[5] << 8) + packet[6]
 
-            _LOGGER.warning(
-                "TT_REPORT cu=%s fnc=%s id=%s",
+        state = packet[8]
+
+        _LOGGER.warning(
+            "TT_REPORT cu=%s fnc=%s id=%s state=%s",
+            cu,
+            fnc,
+            nr,
+            state,
+        )
+
+        if self.writer:
+            self.writer.write(bytes([COMMAND_ACK]))
+            await self.writer.drain()
+
+        if self._event_callback:
+            await self._event_callback(
                 cu,
                 fnc,
                 nr,
+                state,
             )
-            _LOGGER.warning(
-                "TT_REPORT_RAW %s",
-                " ".join(f"{b:02X}" for b in packet),
-            )
-            if self.writer:
-                self.writer.write(
-                    bytes([COMMAND_ACK])
-                )
-                await self.writer.drain()
 
     async def _send(self, packet):
 
