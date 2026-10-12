@@ -97,20 +97,21 @@ class teletask_api:
 
         while True:
 
-            data = await self.reader.read(100)
+            try:
+                data = await self.reader.read(100)
 
-            if not data:
-                _LOGGER.warning("TT_SOCKET_CLOSED")
+                _LOGGER.warning(
+                    "TT_READ_RAW %r",
+                    data,
+                )
 
-                self.reader = None
-
-                if self.writer:
-                    self.writer.close()
-
-                self.writer = None
-
-                return
-
+            except Exception as err:
+                _LOGGER.exception(
+                    "TT_READ_EXCEPTION %s",
+                    err,
+                )
+                raise
+ 
             buffer.extend(data)
 
             cur = 0
