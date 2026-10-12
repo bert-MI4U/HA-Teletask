@@ -37,6 +37,14 @@ class TeletaskLight(LightEntity):
         tt_id,
         tt_state,
     ):
+
+        _LOGGER.warning(
+            "ENTITY_EVENT %s id=%s state=%s",
+            self._attr_name,
+            tt_id,
+            tt_state,
+        )
+ 
         if (
             tt_cu != self._tt_cu
             or tt_id != self._tt_id
@@ -47,7 +55,13 @@ class TeletaskLight(LightEntity):
         if new_state == self._attr_is_on:
             return
         self._attr_is_on = new_state
-        self.async_write_ha_state()
+        _LOGGER.warning(
+            "ENTITY_UPDATE %s -> %s",
+            self._attr_name,
+            self._attr_is_on,
+        )
+#        self.async_write_ha_state()
+        self.schedule_update_ha_state()
 
     async def async_added_to_hass(self):
         await self._api.request_state(
