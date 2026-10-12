@@ -221,6 +221,8 @@ class teletask_api:
             self.writer.write(bytes([COMMAND_ACK]))
             await self.writer.drain()
 
+        _LOGGER.warning("BEFORE_CALLBACK")
+        
         if self._event_callback:
             await self._event_callback(
                 tt_cu,
@@ -229,6 +231,8 @@ class teletask_api:
                 tt_state,
             )
             
+        _LOGGER.warning("BEFORE_LISTENERS")
+        
         for listener in self._listeners:
             _LOGGER.warning(
                 "CALLING_LISTENER %s",
