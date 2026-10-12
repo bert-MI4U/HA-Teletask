@@ -55,7 +55,23 @@ class TeletaskLight(LightEntity):
             return
 
         new_state = tt_state == 255
+        _LOGGER.debug(
+            "TT_Handle_MATCH %s state=%s current=%s",
+            self._attr_name,
+            tt_state,
+            self._attr_is_on,
+        )
         if new_state == self._attr_is_on:
+            if (
+                tt_cu != self._tt_cu
+                or tt_id != self._tt_id
+            ):
+                _LOGGER.warning(
+                    "TT_Handle_IGNORED %s event=%s expected=%s",
+                    self._attr_name,
+                    tt_id,
+                    self._tt_id,
+                )
             return
         self._attr_is_on = new_state
         _LOGGER.warning(
@@ -63,8 +79,8 @@ class TeletaskLight(LightEntity):
             self._attr_name,
             self._attr_is_on,
         )
-#        self.async_write_ha_state()
-        self.schedule_update_ha_state()
+        self.async_write_ha_state()
+#        self.schedule_update_ha_state()
 
     async def async_added_to_hass(self):
         await self._api.request_state(
