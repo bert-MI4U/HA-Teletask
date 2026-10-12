@@ -64,6 +64,18 @@ class teletask_api:
             self._read_loop()
         )
 
+        def _reader_done(task):
+            try:
+                task.result()
+            except Exception:
+                _LOGGER.exception(
+                    "TT_READER_TASK_CRASHED"
+                )
+
+        self._reader_task.add_done_callback(
+            _reader_done
+        )
+        
         self._keepalive_task = asyncio.create_task(
             self._keepalive_loop()
         )
@@ -127,10 +139,7 @@ class teletask_api:
 
     async def _read_loop(self):
 
-        _LOGGER.debug(
-            "TT_READ_LOOP_Started",
-            data,
-        )
+        _LOGGER.debug("TT_READ_LOOP_Started")
 
         buffer = bytearray()
 
