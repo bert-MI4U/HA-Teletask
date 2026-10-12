@@ -1,9 +1,9 @@
 import asyncio
 import logging
 
-_LOGGER = logging.getLogger(__name__)
-
 from .teletask_const import *
+
+_LOGGER = logging.getLogger(__name__)
 
 TT_FUNCTIONS = {
     "relay": FNC_RELAY,
@@ -14,8 +14,8 @@ TT_FUNCTIONS = {
 }
 
 
-
 class teletask_api:
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -25,25 +25,27 @@ class teletask_api:
 
         self._ack_waiter = None
         self._reader_task = None
-        
-    def _log_packet(self, direction, packet):
+        self._keepalive_task = None
+        self._send_lock = asyncio.Lock()
 
+    def _get_function(self, tt_type):
+        return TT_FUNCTIONS[tt_type.lower()]
+
+    def _log_packet(self, direction, packet):
         _LOGGER.warning(
             "%s %s",
             direction,
             " ".join(f"{b:02X}" for b in packet),
         )
 
-    def _get_function(self, tt_type):
+    def _checksum(self, data):
+        return sum(data) & 0xFF
 
-        try:
-            return TT_FUNCTIONS[tt_type.lower()]
-        except KeyError:
-            raise ValueError(
-                f"Unsupported Teletask type: {tt_type}"
-            )
-        
+    def _verify_checksum(self, msg):
+        return self._checksum(msg[:-1]) == msg[-1]
+
     async def connect(self):
+
         self.reader, self.writer = await asyncio.open_connection(
             self.host,
             self.port,
@@ -53,17 +55,48 @@ class teletask_api:
             self._read_loop()
         )
 
+        self._keepalive_task = asyncio.create_task(
+            self._keepalive_loop()
+        )
+
         _LOGGER.warning(
-            "TT_CONNECT %s:%s",
+            "TT_CONNECTED %s:%s",
             self.host,
             self.port,
         )
 
+    async def disconnect(self):
+
+        if self._keepalive_task:
+            self._keepalive_task.cancel()
+
+        if self._reader_task:
+            self._reader_task.cancel()
+
+        if self.writer:
+            self.writer.close()
+            await self.writer.wait_closed()
+
+        _LOGGER.warning("TT_DISCONNECTED")
+
+    async def _keepalive_loop(self):
+
+        while True:
+            await asyncio.sleep(15)
+
+            if self._ack_waiter is None:
+                packet = self._build_packet(
+                    COMMAND_KEEP_ALIVE,
+                    [],
+                )
+                await self._send(packet)
 
     async def _read_loop(self):
+
         buffer = bytearray()
 
         while True:
+
             data = await self.reader.read(100)
 
             if not data:
@@ -72,83 +105,126 @@ class teletask_api:
 
             buffer.extend(data)
 
-            while buffer:
+            cur = 0
 
-                # ACK
-                if buffer[0] == 0x0A:
+            while cur < len(buffer):
+
+                if buffer[cur] == COMMAND_ACK:
+
                     if self._ack_waiter:
                         self._ack_waiter.set()
-                    del buffer[0]
+                        self._ack_waiter = None
+
+                    cur += 1
                     continue
 
-                # need STX + LEN
-                if len(buffer) < 2:
+                if buffer[cur] != STX:
+                    cur += 1
+                    continue
+
+                if cur + 1 >= len(buffer):
                     break
 
-                if buffer[0] != 0x02:
-                    _LOGGER.warning(
-                        "TT_DROP %02X",
-                        buffer[0]
+                length = buffer[cur + 1]
+                packet_length = length + 1
+
+                if len(buffer) - cur < packet_length:
+                    break
+
+                packet = bytes(
+                    buffer[cur:cur + packet_length]
+                )
+
+                if self._verify_checksum(packet):
+
+                    self._log_packet(
+                        "TT_RECV",
+                        packet,
                     )
-                    del buffer[0]
-                    continue
 
-                
-                # TODO:
-                # accumulate packet bytes
-                # parse Event Report (0x10)
-                # dispatch callbacks
+                    await self._process_packet(packet)
 
+                cur += packet_length
+
+            if cur:
+                del buffer[:cur]
+
+    async def _process_packet(self, packet):
+
+        command = packet[2]
+
+        if command == COMMAND_REPORT:
+
+            cu = packet[3]
+            fnc = packet[4]
+            nr = (packet[5] << 8) + packet[6]
+
+            _LOGGER.warning(
+                "TT_REPORT cu=%s fnc=%s id=%s",
+                cu,
+                fnc,
+                nr,
+            )
+
+            if self.writer:
+                self.writer.write(
+                    bytes([COMMAND_ACK])
+                )
+                await self.writer.drain()
 
     async def _send(self, packet):
 
-        self._ack_waiter = asyncio.Event()
+        async with self._send_lock:
 
-        self.writer.write(packet)
-        await self.writer.drain()
+            self._ack_waiter = asyncio.Event()
 
-        try:
-            await asyncio.wait_for(
-                self._ack_waiter.wait(),
-                timeout=1.0,
+            self._log_packet(
+                "TT_SEND",
+                packet,
             )
 
-            _LOGGER.warning("TT_ACK_OK")
+            self.writer.write(packet)
+            await self.writer.drain()
 
-        except asyncio.TimeoutError:
-            _LOGGER.warning("TT_ACK_TIMEOUT")
+            try:
+                await asyncio.wait_for(
+                    self._ack_waiter.wait(),
+                    timeout=1.0,
+                )
 
-        finally:
-            self._ack_waiter = None
+                _LOGGER.warning(
+                    "TT_ACK_OK"
+                )
 
- 
-    async def disconnect(self):
-        if self.writer:
-            self.writer.close()
-            await self.writer.wait_closed()
-            
-        _LOGGER.warning("TT_Disconnected")
+            except asyncio.TimeoutError:
 
-    def _build_packet(self, command, parameters):
+                _LOGGER.warning(
+                    "TT_ACK_TIMEOUT"
+                )
+
+            finally:
+                self._ack_waiter = None
+
+    def _build_packet(
+        self,
+        command,
+        parameters,
+    ):
 
         packet = bytearray()
 
         packet.append(STX)
 
         length = 3 + len(parameters)
+
         packet.append(length)
 
         packet.append(command)
 
         packet.extend(parameters)
 
-        checksum = sum(packet) & 0xFF
-        packet.append(checksum)
-
-        _LOGGER.warning(
-            "TT_BUILD len=%s checksum=%02X",
-            length,
-            checksum,
+        packet.append(
+            self._checksum(packet)
         )
 
         return bytes(packet)
@@ -161,12 +237,15 @@ class teletask_api:
         value,
     ):
 
-        function = self._get_function(tt_type)
-        
-        if tt_type == "dimmer":
-            setting = int(value)
-        else:
-            setting = SET_ON if value else SET_OFF
+        function = self._get_function(
+            tt_type
+        )
+
+        setting = (
+            int(value)
+            if tt_type == "dimmer"
+            else SET_ON if value else SET_OFF
+        )
 
         packet = self._build_packet(
             COMMAND_SET,
@@ -179,18 +258,10 @@ class teletask_api:
             ],
         )
 
-        _LOGGER.warning(
-            "TT_SET type=%s cu=%s id=%s value=%s",
-            tt_type,
-            tt_cu,
-            tt_id,
-            value,
-        )
-        self._log_packet("TT_SEND", packet)
         await self._send(packet)
+
         return True
 
-        
     async def get_state(
         self,
         tt_type,
@@ -198,7 +269,9 @@ class teletask_api:
         tt_id,
     ):
 
-        function = self._get_function(tt_type)
+        function = self._get_function(
+            tt_type
+        )
 
         packet = self._build_packet(
             COMMAND_GET,
@@ -210,13 +283,6 @@ class teletask_api:
             ],
         )
 
-        _LOGGER.warning(
-            "TT_SET type=%s cu=%s id=%s value=%s",
-            tt_type,
-            tt_cu,
-            tt_id,
-        )
-        self._log_packet("TT_SEND", packet)
         await self._send(packet)
 
         return None
