@@ -2,6 +2,9 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntity,
 )
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 class TeletaskLight(LightEntity):
 
