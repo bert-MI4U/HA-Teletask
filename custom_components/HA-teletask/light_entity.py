@@ -34,8 +34,10 @@ class TeletaskLight(LightEntity):
         ):
             return
 
-        self._attr_is_on = state == 255
-
+        new_state = tt_state == 255
+        if new_state == self._attr_is_on:
+            return
+        self._attr_is_on = new_state
         self.async_write_ha_state()
 
     async def async_turn_on(self, **kwargs):

@@ -11,6 +11,11 @@ from .teletask_api import teletask_api
 
 DOMAIN = "ha_teletask"
 
+def register_listener(
+    self,
+    listener,
+):
+    self._listeners.append(listener)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})

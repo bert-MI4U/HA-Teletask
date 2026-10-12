@@ -190,6 +190,11 @@ class teletask_api:
 
     async def _process_packet(self, packet):
 
+        _LOGGER.info(
+            "TT_LISTENERS=%s",
+            len(self._listeners),
+        )
+        
         command = packet[2]
 
         if command != COMMAND_REPORT:
