@@ -230,6 +230,10 @@ class teletask_api:
             )
             
         for listener in self._listeners:
+            _LOGGER.warning(
+                "CALLING_LISTENER %s",
+                listener,
+            )
             listener(
                 tt_cu,
                 tt_type,
