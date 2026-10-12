@@ -28,6 +28,8 @@ async def handle_teletask_event(
     tt_id,
     tt_state,
 ):
+    _LOGGER.warning("IN_INIT_CALLBACK")
+
     _LOGGER.warning(
         "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
         tt_cu,
