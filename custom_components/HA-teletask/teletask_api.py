@@ -80,7 +80,8 @@ class teletask_api:
         tt_cu,
         tt_id,
     ):
-
+    #request Teletask status after initial startup
+    
         function = self._get_function(tt_type)
 
         packet = self._build_packet(
@@ -127,11 +128,6 @@ class teletask_api:
     async def _read_loop(self):
 
         buffer = bytearray()
-
-        _LOGGER.warning(
-            "TT_READ_RAW %s",
-            data,
-        )
 
         while True:
 
