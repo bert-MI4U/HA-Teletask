@@ -73,7 +73,7 @@ class teletask_api:
             ],
         )
 
-await self._send(packet)
+        await self._send(packet)
 
     async def disconnect(self):
 
