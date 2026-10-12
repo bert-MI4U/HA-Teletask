@@ -139,7 +139,7 @@ class teletask_api:
 
     async def _read_loop(self):
 
-        _LOGGER.debug("TT_READ_LOOP_Started")
+        _LOGGER.debug("TT_READLOOP_Started")
 
         buffer = bytearray()
 
@@ -238,12 +238,17 @@ class teletask_api:
         _LOGGER.debug("BEFORE_CALLBACK")
         
         if self._event_callback:
-            await self._event_callback(
-                tt_cu,
-                tt_type,
-                tt_id,
-                tt_state,
-            )
+            try:
+                await self._event_callback(
+                    tt_cu,
+                    tt_type,
+                    tt_id,
+                    tt_state,
+                )
+            except Exception:
+                _LOGGER.exception(
+                    "TT_EVENT_CALLBACK_FAILED"
+                )
             
         _LOGGER.debug("BEFORE_LISTENERS")
         
@@ -252,13 +257,18 @@ class teletask_api:
                 "CALLING_LISTENER %s",
                 listener,
             )
-            listener(
-                tt_cu,
-                tt_type,
-                tt_id,
-                tt_state,
-            )
-
+            try:
+                listener(
+                    tt_cu,
+                    tt_type,
+                    tt_id,
+                    tt_state,
+                )
+            except Exception:
+                _LOGGER.exception(
+                    "TT_LISTENER_FAILED"
+                )
+        
     async def _send(self, packet):
 
         async with self._send_lock:
