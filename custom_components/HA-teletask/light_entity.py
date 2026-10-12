@@ -62,17 +62,14 @@ class TeletaskLight(LightEntity):
             self._attr_is_on,
         )
         if new_state == self._attr_is_on:
-            if (
-                tt_cu != self._tt_cu
-                or tt_id != self._tt_id
-            ):
-                _LOGGER.warning(
-                    "TT_Handle_IGNORED %s event=%s expected=%s",
-                    self._attr_name,
-                    tt_id,
-                    self._tt_id,
-                )
+            _LOGGER.warning(
+                "TT_HANDLE_NO_CHANGE %s state=%s current=%s",
+                self._attr_name,
+                tt_state,
+                self._attr_is_on,
+            )
             return
+            
         self._attr_is_on = new_state
         _LOGGER.warning(
             "ENTITY_UPDATE %s -> %s",
