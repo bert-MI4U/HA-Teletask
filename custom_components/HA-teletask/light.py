@@ -30,7 +30,7 @@ async def async_setup_entry(
             entities.append(entity)
 
             _LOGGER.debug(
-                "REGISTER %s id=%s",
+                "TT_REGISTER %s id=%s",
                 entity._attr_name,
                 entity._tt_id,
             )
