@@ -89,6 +89,7 @@ class TeletaskLight(LightEntity):
                     new_brightness,
                     self._attr_is_on,
                     self._attr_brightness,
+                )
                 return
         else:
             if new_state == self._attr_is_on:

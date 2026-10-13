@@ -30,7 +30,7 @@ class teletask_api:
         self._keepalive_task = None
         self._send_lock = asyncio.Lock()
         self._event_callback = None
-        self._listeners = []
+        self._listeners = {}
 
 
     def _get_function(self, tt_type):
@@ -50,10 +50,20 @@ class teletask_api:
         return self._checksum(msg[:-1]) == msg[-1]
 
     def register_listener(
+    #Create 1 listener for Teletask as it sends all information to all listeners if there are more.
         self,
+        tt_cu,
+        tt_type,
+        tt_id,
         listener,
     ):
-        self._listeners.append(listener)
+        key = (
+            tt_cu,
+            tt_type,
+            tt_id,
+        )
+
+        self._listeners[key] = listener
     
     async def connect(self):
         #Connect to Teletask controller 
@@ -295,12 +305,18 @@ class teletask_api:
                 )
             
         _LOGGER.debug("TT_BEFORE_LISTENERS")
-        #notify listeners to update information in HA
-        for listener in self._listeners:
-            _LOGGER.debug(
-                "TT_CALLING_LISTENER %s",
-                listener,
-            )
+        #notify listener to update information in HA
+        _LOGGER.debug("TT_BEFORE_LISTENERS")
+
+        key = (
+            tt_cu,
+            tt_type,
+            tt_id,
+        )
+
+        listener = self._listeners.get(key)
+
+        if listener:
             try:
                 listener(
                     tt_cu,
