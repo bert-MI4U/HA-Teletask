@@ -1,4 +1,5 @@
 from homeassistant.components.light import (
+    Attr_brightness,
     ColorMode,
     LightEntity,
 )
@@ -24,12 +25,20 @@ class TeletaskLight(LightEntity):
         self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
         self._attr_entity_id = f"light.{self._attr_unique_id}"
         
-        self._attr_supported_color_modes = {
-            ColorMode.ONOFF
-        }
-        self._attr_color_mode = ColorMode.ONOFF
         self._attr_is_on = False
+        self._attr_brightness = 255
 
+        if self._tt_type == "dimmer":
+            self._attr_supported_color_modes = {
+                ColorMode.BRIGHTNESS
+            }
+            self._attr_color_mode = ColorMode.BRIGHTNESS
+        else:
+            self._attr_supported_color_modes = {
+                ColorMode.ONOFF
+            }
+            self._attr_color_mode = ColorMode.ONOFF
+    
     def handle_event(
         self,
         tt_cu,
