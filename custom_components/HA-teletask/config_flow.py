@@ -1,4 +1,4 @@
-#explaining the integration creation process
+#explaining the integration creation process from HACS download
 from homeassistant import config_entries
 
 

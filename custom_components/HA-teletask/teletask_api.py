@@ -263,7 +263,7 @@ class teletask_api:
     async def _process_packet(self, packet):
 
         _LOGGER.debug(
-            "TT_LISTENERS=%s",
+            "TT_LISTENER_ENTITIES=%s",
             len(self._listeners),
         )
         
@@ -304,7 +304,6 @@ class teletask_api:
                     "TT_EVENT_CALLBACK_FAILED"
                 )
             
-        _LOGGER.debug("TT_BEFORE_LISTENERS")
         #notify listener to update information in HA
         _LOGGER.debug("TT_BEFORE_LISTENERS")
 

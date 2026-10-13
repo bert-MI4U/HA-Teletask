@@ -48,7 +48,7 @@ class TeletaskLight(LightEntity):
     ):
 
         _LOGGER.info(
-            "TT_ENTITY_EVENT %s %s %s",
+            "TT_ENTITY_EVENT name=%s id=%s state=%s",
             self._attr_name,
             tt_id,
             tt_state,
