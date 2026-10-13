@@ -37,7 +37,7 @@ class teletask_api:
         return TT_FUNCTIONS[tt_type.lower()]
 
     def _log_packet(self, direction, packet):
-        _LOGGER.debug(
+        _LOGGER.info(
             "%s %s",
             direction,
             " ".join(f"{b:02X}" for b in packet),
