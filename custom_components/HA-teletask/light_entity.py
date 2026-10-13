@@ -128,15 +128,26 @@ class TeletaskLight(LightEntity):
 
     async def async_turn_on(self, **kwargs):
     #turn on light
-        await self._api.set_state(
-            self._tt_type,
-            self._tt_cu,
-            self._tt_id,
-            True,
-        )
+        if self._tt_type == "dimmer":
+            brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
+            level = round((brightness / 255) * 100)
 
+            await self._api.set_state(
+                self._tt_type,
+                self._tt_cu,
+                self._tt_id,
+                level,
+            )
+        else:
+            await self._api.set_state(
+                self._tt_type,
+                self._tt_cu,
+                self._tt_id,
+                True,
+            )
+        
     async def async_turn_off(self, **kwargs):
-    #turn of light
+    #turn off light
         await self._api.set_state(
             self._tt_type,
             self._tt_cu,
