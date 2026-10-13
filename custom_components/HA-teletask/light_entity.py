@@ -26,7 +26,7 @@ class TeletaskLight(LightEntity):
         self._attr_entity_id = f"light.{self._attr_unique_id}"
         
         self._attr_is_on = False
-        self._attr_brightness = 255
+        self._attr_brightness = None
 
         if self._tt_type == "dimmer":
             self._attr_supported_color_modes = {
@@ -65,7 +65,10 @@ class TeletaskLight(LightEntity):
             return
         
         #convert teletask state to HA
-        new_state = tt_state == 255
+        if self._tt_type == "dimmer":
+            new_state = tt_state > 0
+        else:
+            new_state = tt_state == 255
         _LOGGER.debug(
             "TT_HANDLE_MATCH %s state=%s current=%s",
             self._attr_name,
@@ -82,7 +85,16 @@ class TeletaskLight(LightEntity):
             )
             return
         #update state    
-        self._attr_is_on = new_state
+        if self._tt_type == "dimmer":
+            self._attr_is_on = tt_state > 0
+            self._attr_brightness = round((tt_state / 100) * 255)
+             _LOGGER.debug(
+                "TT_DIMMER_EVENT level=%s brightness=%s",
+                tt_state,
+                self._attr_brightness,
+            )
+        else:
+            self._attr_is_on = tt_state != 0
         _LOGGER.info(
             "TT_ENTITY_UPDATE %s -> %s",
             self._attr_name,
