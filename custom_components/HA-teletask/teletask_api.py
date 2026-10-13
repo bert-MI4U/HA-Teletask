@@ -133,8 +133,8 @@ class teletask_api:
         
     async def request_state(
         self,
-        tt_type,
         tt_cu,
+        tt_type,
         tt_id,
     ):
     #request Teletask status after initial startup
@@ -409,8 +409,8 @@ class teletask_api:
     async def set_state(
     #update information/change state in teletask
         self,
-        tt_type,
         tt_cu,
+        tt_type,
         tt_id,
         value,
     ):

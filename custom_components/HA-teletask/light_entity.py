@@ -166,15 +166,15 @@ class TeletaskLight(LightEntity):
             level = round((brightness / 255) * 100)
 
             await self._api.set_state(
-                self._tt_type,
                 self._tt_cu,
+                self._tt_type,
                 self._tt_id,
                 level,
             )
         else:
             await self._api.set_state(
-                self._tt_type,
                 self._tt_cu,
+                self._tt_type,
                 self._tt_id,
                 True,
             )
@@ -182,8 +182,8 @@ class TeletaskLight(LightEntity):
     async def async_turn_off(self, **kwargs):
     #turn off light
         await self._api.set_state(
-            self._tt_type,
             self._tt_cu,
+            self._tt_type,
             self._tt_id,
             False,
         )

@@ -23,7 +23,6 @@ class TeletaskSwitch(SwitchEntity):
         self._attr_unique_id = (
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
-
         self._attr_entity_id = (
             f"switch.{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
@@ -47,8 +46,10 @@ class TeletaskSwitch(SwitchEntity):
 
             if (
                 tt_cu != self._tt_cu
-                or tt_id != self._tt_id
-                or tt_type != self._tt_type
+                or (
+                    tt_id != self._tt_id
+                    and tt_type != self._tt_type
+                )
             ):
                 return
 
@@ -70,7 +71,8 @@ class TeletaskSwitch(SwitchEntity):
                 self._attr_name,
                 self._attr_is_on,
             )
-         except Exception:
+        
+        except Exception:
             _LOGGER.exception(
                 "TT_SWITCH_EXCEPTION %s",
                 self._attr_name,
@@ -94,8 +96,8 @@ class TeletaskSwitch(SwitchEntity):
         )
         #request initial state
         await self._api.request_state(
-            self._tt_type,
             self._tt_cu,
+            self._tt_type,
             self._tt_id,
         )
         #assign area from config
@@ -114,15 +116,15 @@ class TeletaskSwitch(SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(
-            self._tt_type,
             self._tt_cu,
+            self._tt_type,
             self._tt_id,
             True        )
 
     async def async_turn_off(self, **kwargs):
         await self._api.set_state(
-            self._tt_type,
             self._tt_cu,
+            self._tt_type,
             self._tt_id,
             False,
         )
