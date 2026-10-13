@@ -88,7 +88,7 @@ class TeletaskLight(LightEntity):
         if self._tt_type == "dimmer":
             self._attr_is_on = tt_state > 0
             self._attr_brightness = round((tt_state / 100) * 255)
-             _LOGGER.debug(
+            _LOGGER.debug(
                 "TT_DIMMER_EVENT level=%s brightness=%s",
                 tt_state,
                 self._attr_brightness,
