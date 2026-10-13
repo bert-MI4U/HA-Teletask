@@ -31,20 +31,5 @@ async def async_setup_entry(
             )
             entities.append(entity)
 
-"""            _LOGGER.debug(
-                "TT_REGISTER %s id=%s",
-                entity._attr_name,
-                entity._tt_id,
-            )
-            
-            #TELETASK relay changes -> teletask_api.py receives packet -> listener called -> filters entity
-            # handle_event() ->  light state updated
-            api.register_listener(
-                entity._tt_cu,
-                api._get_function(entity._tt_type),
-                entity._tt_id,
-                entity.handle_event,
-            )
-"""    
     #add all lights to HA
     async_add_entities(entities)
