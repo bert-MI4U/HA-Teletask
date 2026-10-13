@@ -2,6 +2,9 @@ from homeassistant.components.light import (
     ColorMode,
     LightEntity,
 )
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import entity_registry as er
+
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -10,10 +13,10 @@ class TeletaskLight(LightEntity):
 
     def __init__(self, config, api):
         self._api = api
+        self._config = config
 
         self._attr_name = config["name"]
         self._attr_icon = config["icon"]
-        self._attr_area = config["room"]
         self._tt_type = config["teletask"]["type"]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
@@ -80,12 +83,27 @@ class TeletaskLight(LightEntity):
 #        self.schedule_update_ha_state()
 
     async def async_added_to_hass(self):
-    #wait for the state of the light
+
+        # Request initial state
         await self._api.request_state(
             self._tt_type,
             self._tt_cu,
             self._tt_id,
         )
+
+        # Assign area from config
+        room_name = self._config["room"]
+
+        area_registry = ar.async_get(self.hass)
+        entity_registry = er.async_get(self.hass)
+
+        area = area_registry.async_get_area_by_name(room_name)
+
+        if area:
+            entity_registry.async_update_entity(
+                self.entity_id,
+                area_id=area.id,
+            )
 
     async def async_turn_on(self, **kwargs):
     #turn on light
