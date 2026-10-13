@@ -37,33 +37,45 @@ class TeletaskSwitch(SwitchEntity):
         tt_id,
         tt_state,
     ):
+        
+        try: 
+            _LOGGER.warning(
+                "TT_SWITCH_HANDLE_EVENT %s state=%s",
+                self._attr_name,
+                tt_state,
+            )
 
-        _LOGGER.warning(
-            "TT_SWITCH_HANDLE_EVENT %s state=%s",
-            self._attr_name,
-            tt_state,
-        )
+            if (
+                tt_cu != self._tt_cu
+                or tt_id != self._tt_id
+                or tt_type != self._tt_type
+            ):
+                return
 
-        if (
-            tt_cu != self._tt_cu
-            or tt_id != self._tt_id
-            or tt_type != self._tt_type
-        ):
-            return
+            new_state = tt_state != 0
 
-        new_state = tt_state != 0
+            _LOGGER.warning(
+                "TT_SWITCH_STATE %s old=%s new=%s",
+                self._attr_name,
+                self._attr_is_on,
+                new_state,
+            )
 
-        if new_state == self._attr_is_on:
-            return
+            self._attr_is_on = new_state
 
-        self._attr_is_on = new_state
-        _LOGGER.warning(
-            "TT_SWITCH_UPDATE %s -> %s",
-            self._attr_name,
-            self._is_on,
-        )
-        self.async_write_ha_state()
+            self.async_write_ha_state()
 
+            _LOGGER.warning(
+                "TT_SWITCH_WRITTEN %s state=%s",
+                self._attr_name,
+                self._attr_is_on,
+            )
+         except Exception:
+            _LOGGER.exception(
+                "TT_SWITCH_EXCEPTION %s",
+                self._attr_name,
+            )
+    
     async def async_added_to_hass(self):
 
         _LOGGER.warning(
