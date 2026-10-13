@@ -37,6 +37,13 @@ class TeletaskSwitch(SwitchEntity):
         tt_id,
         tt_state,
     ):
+
+        _LOGGER.warning(
+            "TT_SWITCH_HANDLE_EVENT %s state=%s",
+            self._name,
+            tt_state,
+        )
+
         if (
             tt_cu != self._tt_cu
             or tt_id != self._tt_id
@@ -50,6 +57,11 @@ class TeletaskSwitch(SwitchEntity):
             return
 
         self._attr_is_on = new_state
+        _LOGGER.warning(
+            "TT_SWITCH_UPDATE %s -> %s",
+            self._name,
+            self._is_on,
+        )
         self.async_write_ha_state()
 
     async def async_added_to_hass(self):
