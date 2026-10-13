@@ -76,14 +76,29 @@ class TeletaskLight(LightEntity):
             self._attr_is_on,
         )
         #prevent unnecessary updates 
-        if new_state == self._attr_is_on:
-            _LOGGER.debug(
-                "TT_HANDLE_NO_CHANGE %s state=%s current=%s",
-                self._attr_name,
-                tt_state,
-                self._attr_is_on,
-            )
-            return
+        if self._tt_type == "dimmer":
+            new_brightness = round((tt_state / 100) * 255)
+
+            if (
+                new_state == self._attr_is_on
+                and new_brightness == self._attr_brightness
+            ):
+                _LOGGER.debug(
+                    "TT_HANDLE_NO_DIMMER_CHANGE state=%s brightness=%s current_state=%s current_brightness=%s",
+                    new_state,
+                    new_brightness,
+                    self._attr_is_on,
+                    self._attr_brightness,
+                return
+        else:
+            if new_state == self._attr_is_on:
+                _LOGGER.debug(
+                    "TT_HANDLE_NO_LIGHT_CHANGE %s state=%s current=%s",
+                    self._attr_name,
+                    tt_state,
+                    self._attr_is_on,
+                )
+                return
         #update state    
         if self._tt_type == "dimmer":
             self._attr_is_on = tt_state > 0
