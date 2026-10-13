@@ -97,6 +97,15 @@ class teletask_api:
             FNC_RELAY,
             SET_ON,
         )
+
+        _LOGGER.debug(
+            "TT_ENABLE_DIMMER_LOG"
+        )
+
+        await self.function_log(
+            FNC_DIMMER,
+            SET_ON,
+        )
         
     async def request_state(
         self,
