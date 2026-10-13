@@ -59,7 +59,7 @@ class teletask_api:
     ):
         key = (
             tt_cu,
-            tt_type,
+            self._get_function(tt_type),
             tt_id,
         )
 
@@ -180,6 +180,7 @@ class teletask_api:
 
     async def _keepalive_loop(self):
     #every 15seconds a keepalive is sent to Teletask to keep feedback going
+    #if not already waiting for feedback
 
         while True:
             await asyncio.sleep(15)
@@ -404,12 +405,11 @@ class teletask_api:
             tt_type
         )
 
-        setting = (
-            int(value)
-            if tt_type == "dimmer"
-            else SET_ON if value else SET_OFF
-        )
-
+        if tt_type == "dimmer":
+            setting = int(value)
+        else:
+            setting = SET_ON if value else SET_OFF
+        
         packet = self._build_packet(
             COMMAND_SET,
             [
