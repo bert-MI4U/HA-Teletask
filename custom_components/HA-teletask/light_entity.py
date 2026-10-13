@@ -1,5 +1,5 @@
 from homeassistant.components.light import (
-    Attr_brightness,
+    ATTR_BRIGHTNESS,
     ColorMode,
     LightEntity,
 )
