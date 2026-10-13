@@ -111,6 +111,7 @@ class TeletaskLight(LightEntity):
             )
         else:
             self._attr_is_on = tt_state != 0
+
         _LOGGER.info(
             "TT_ENTITY_UPDATE %s -> %s",
             self._attr_name,
@@ -120,6 +121,21 @@ class TeletaskLight(LightEntity):
 #        self.schedule_update_ha_state()
 
     async def async_added_to_hass(self):
+
+        _LOGGER.warning(
+            "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
+            self._attr_name,
+            self._tt_cu,
+            self._tt_type,
+            self._tt_id,
+        )
+        #request listener
+        self._api.register_listener(
+            self._tt_cu,
+            self._tt_type,
+            self._tt_id,
+            self.handle_event,
+        )
 
         # Request initial state
         await self._api.request_state(
@@ -141,6 +157,7 @@ class TeletaskLight(LightEntity):
                 self.entity_id,
                 area_id=area.id,
             )
+
 
     async def async_turn_on(self, **kwargs):
     #turn on light

@@ -53,17 +53,31 @@ class TeletaskSwitch(SwitchEntity):
         self.async_write_ha_state()
 
     async def async_added_to_hass(self):
+
+        _LOGGER.warning(
+            "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
+            self._attr_name,
+            self._tt_cu,
+            self._tt_type,
+            self._tt_id,
+        )
+        #request listener
+        self._api.register_listener(
+            self._tt_cu,
+            self._tt_type,
+            self._tt_id,
+            self.handle_event,
+        )
+        #request initial state
         await self._api.request_state(
             self._tt_type,
             self._tt_cu,
             self._tt_id,
         )
-
+        #assign area from config
         room_name = self._config["room"]
-
         area_registry = ar.async_get(self.hass)
         entity_registry = er.async_get(self.hass)
-
         area = area_registry.async_get_area_by_name(room_name)
 
         if area:
@@ -71,6 +85,8 @@ class TeletaskSwitch(SwitchEntity):
                 self.entity_id,
                 area_id=area.id,
             )
+            
+    
 
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(

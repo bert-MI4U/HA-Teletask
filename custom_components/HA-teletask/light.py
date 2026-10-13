@@ -30,19 +30,6 @@ async def async_setup_entry(
                 asset["name"],
             )
             entities.append(entity)
-    _LOGGER.warning(
-        "TT_ENTITY_SETUP cu=%s type=%s id=%s name=%s",
-        tt_cu,
-        tt_type,
-        tt_id,
-        self._attr_name,
-    )
 
-    api.register_listener(
-        tt_cu,
-        tt_type,
-        tt_id,
-        self._handle_teletask_event,
-    )
     #add all lights to HA
     async_add_entities(entities)
