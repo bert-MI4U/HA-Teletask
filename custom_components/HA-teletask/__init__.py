@@ -1,14 +1,20 @@
 """HA-Teletask integration."""
 
+#__init__.py is the integration's orchestra conductor: 
+#it loads the configuration, creates the TELETASK connection, 
+#listens for events, stores shared objects, 
+#loads the light entities, 
+#and cleans everything up when the integration stops
+
 import json
 import logging
-
 _LOGGER = logging.getLogger(__name__)
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .teletask_api import teletask_api
 
+#Do not use Teletask as other integration use the same name.
 DOMAIN = "ha_teletask"
 
 def register_listener(
@@ -22,6 +28,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True
 
 async def handle_teletask_event(
+#Read the last teletask action and log (for debugging)
     hass,
     tt_cu,
     tt_type,
@@ -46,6 +53,7 @@ async def handle_teletask_event(
     }
 
 async def async_setup_entry(
+#Called on startup
     hass: HomeAssistant,
     entry: ConfigEntry,
 ) -> bool:
@@ -53,7 +61,7 @@ async def async_setup_entry(
     _LOGGER.info("TT_integration_started")
     
     hass.data.setdefault(DOMAIN, {})
-
+    #Read the configuration json 
     with open(
         "/config/custom_components/ha_teletask/config.json",
         "r",
@@ -65,7 +73,7 @@ async def async_setup_entry(
         config["teletask"]["ip"],
         config["teletask"]["port"],
     )
-    
+    #register callback (Teletask Event -> teletask_api -> handle_teletask_event
     api._event_callback = (
         lambda tt_cu, tt_type, tt_id, tt_state:
             handle_teletask_event(
@@ -79,11 +87,13 @@ async def async_setup_entry(
     
     await api.connect()
 
+    #Store api and config for access from other files
     hass.data[DOMAIN][entry.entry_id] = {
         "config": config,
         "api": api,
     }
-
+    
+    #load HA platforms
     await hass.config_entries.async_forward_entry_setups(
         entry,
         ["light"],

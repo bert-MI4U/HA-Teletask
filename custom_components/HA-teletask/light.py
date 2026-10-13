@@ -1,8 +1,9 @@
 from .light_entity import TeletaskLight
 import logging
-
 _LOGGER = logging.getLogger(__name__)
 
+
+#create home assistant light entities
 async def async_setup_entry(
     hass,
     entry,
@@ -34,9 +35,12 @@ async def async_setup_entry(
                 entity._attr_name,
                 entity._tt_id,
             )
-
+            
+            #TELETASK relay changes -> teletask_api.py receives packet -> listener called ->
+            # handle_event() ->  light state updated
             api.register_listener(
                 entity.handle_event
             )
-
+    
+    #add all lights to HA
     async_add_entities(entities)

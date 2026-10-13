@@ -1,3 +1,4 @@
+#explaining the integration creation process
 from homeassistant import config_entries
 
 

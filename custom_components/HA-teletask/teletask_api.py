@@ -1,3 +1,4 @@
+#Connect to Teletask controller through api.
 import asyncio
 import logging
 
@@ -17,6 +18,7 @@ TT_FUNCTIONS = {
 class teletask_api:
 
     def __init__(self, host, port):
+    #create api object
         self.host = host
         self.port = port
 
@@ -54,12 +56,12 @@ class teletask_api:
         self._listeners.append(listener)
     
     async def connect(self):
-
+        #Connect to Teletask controller 
         self.reader, self.writer = await asyncio.open_connection(
             self.host,
             self.port,
         )
-
+        #start read_loop
         self._reader_task = asyncio.create_task(
             self._read_loop()
         )
@@ -76,6 +78,7 @@ class teletask_api:
             _reader_done
         )
         
+        #start keepalive_loop
         self._keepalive_task = asyncio.create_task(
             self._keepalive_loop()
         )
@@ -118,6 +121,7 @@ class teletask_api:
         await self._send(packet) 
 
     async def function_log(
+    #tell Teletask to send events for devices
         self,
         tt_type,
         tt_state,
@@ -156,6 +160,7 @@ class teletask_api:
         _LOGGER.warning("TT_DISCONNECTED")
 
     async def _keepalive_loop(self):
+    #every 15seconds a keepalive is sent to Teletask to keep feedback going
 
         while True:
             await asyncio.sleep(15)
@@ -168,7 +173,7 @@ class teletask_api:
                 await self._send(packet)
 
     async def _read_loop(self):
-
+    #receive teletask information (bytes)    
         _LOGGER.debug("TT_READLOOP_STARTED")
 
         buffer = bytearray()
@@ -195,7 +200,7 @@ class teletask_api:
             cur = 0
 
             while cur < len(buffer):
-
+                #detect ACK
                 if buffer[cur] == COMMAND_ACK:
 
                     if self._ack_waiter:
@@ -204,11 +209,11 @@ class teletask_api:
 
                     cur += 1
                     continue
-
+                #detect packet start
                 if buffer[cur] != STX:
                     cur += 1
                     continue
-
+                #extract packet
                 if cur + 1 >= len(buffer):
                     break
 
@@ -221,14 +226,14 @@ class teletask_api:
                 packet = bytes(
                     buffer[cur:cur + packet_length]
                 )
-
+                #validate checksup
                 if self._verify_checksum(packet):
 
                     self._log_packet(
                         "TT_RECV",
                         packet,
                     )
-
+                    #process packet
                     await self._process_packet(packet)
 
                 cur += packet_length
@@ -247,7 +252,7 @@ class teletask_api:
 
         if command != COMMAND_REPORT:
             return
-
+        #get teletask device identity from the packet
         tt_cu = packet[3]
         tt_type = packet[4]
         tt_id = (packet[5] << 8) + packet[6]
@@ -260,7 +265,7 @@ class teletask_api:
             tt_id,
             tt_state,
         )
-
+        #acknowledge packet reception to teletask
         if self.writer:
             self.writer.write(bytes([COMMAND_ACK]))
             await self.writer.drain()
@@ -281,7 +286,7 @@ class teletask_api:
                 )
             
         _LOGGER.debug("TT_BEFORE_LISTENERS")
-        
+        #notify listeners to update information in HA
         for listener in self._listeners:
             _LOGGER.debug(
                 "TT_CALLING_LISTENER %s",
@@ -317,7 +322,7 @@ class teletask_api:
 
             self.writer.write(packet)
             await self.writer.drain()
-
+            #wait 1s for teletask confirmation otherwise timeout
             try:
                 await asyncio.wait_for(
                     self._ack_waiter.wait(),
@@ -338,6 +343,7 @@ class teletask_api:
                 self._ack_waiter = None
 
     def _build_packet(
+    #builds packet as required by teletask api
         self,
         command,
         parameters,
@@ -362,6 +368,7 @@ class teletask_api:
         return bytes(packet)
 
     async def set_state(
+    #update information/change state in teletask
         self,
         tt_type,
         tt_cu,
