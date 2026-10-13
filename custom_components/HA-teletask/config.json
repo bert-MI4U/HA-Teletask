@@ -11,6 +11,12 @@
         {"name": "HAT-Boven", "component": "light", "device": "TT Hal", "room": "Hal Boven", "icon": "mdi:light-recessed",
 			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 33}},
         {"name": "HAT-Wandlicht", "component": "light", "device": "TT Hal", "room": "Bureau", "icon": "mdi:light-recessed",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 36}}
+			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 36}},
+        {"name": "HAT-Off Bureau", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-outlet-de",
+			"teletask" :{ "type": "locmood", "central_unit": 1, "teletask_id": 20}},
+        {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:power-outlet-de",
+			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
+        {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-outlet-de",
+			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}},
  ]
 }

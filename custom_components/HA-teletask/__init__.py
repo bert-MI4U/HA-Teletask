@@ -14,6 +14,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .teletask_api import teletask_api
 
+PLATFORMS = [
+    "light",
+    "switch",
+]
 #Do not use Teletask as other integration use the same name.
 DOMAIN = "ha_teletask"
 
@@ -96,7 +100,7 @@ async def async_setup_entry(
     #load HA platforms
     await hass.config_entries.async_forward_entry_setups(
         entry,
-        ["light"],
+        PLATFORMS,
     )
 
     return True
