@@ -63,7 +63,21 @@ class teletask_api:
             tt_id,
         )
 
-        self._listeners[key] = listener
+        _LOGGER.warning(
+            "TT_REGISTER key=%s listener=%s",
+            key,
+            getattr(listener, "__qualname__", str(listener)),
+        )
+
+        if key not in self._listeners:
+            self._listeners[key] = []
+
+        self._listeners[key].append(listener)
+
+        _LOGGER.warning(
+            "TT_LISTENERS_REGISTERED=%d",
+            len(self._listeners[key]),
+        )
     
     async def connect(self):
         #Connect to Teletask controller 
