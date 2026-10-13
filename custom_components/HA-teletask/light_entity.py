@@ -11,15 +11,15 @@ class TeletaskLight(LightEntity):
     def __init__(self, config, api):
         self._api = api
 
+        self._attr_name = config["name"]
         self._attr_icon = config["icon"]
-        self._suggested_area = config["room"]
+        self._attr_area = config["room"]
         self._tt_type = config["teletask"]["type"]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-        #create unique name refering to teletask device
-        self._attr_name = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
         #Create unique ID for use in HA
-        self._attr_unique_id = self._attr_name
+        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
+        self._attr_entity_id = f"light.{self._attr_unique_id}"
         
         self._attr_supported_color_modes = {
             ColorMode.ONOFF
