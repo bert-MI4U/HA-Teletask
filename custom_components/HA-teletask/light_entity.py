@@ -139,8 +139,8 @@ class TeletaskLight(LightEntity):
 
         # Request initial state
         await self._api.request_state(
-            self._tt_type,
             self._tt_cu,
+            self._tt_type,
             self._tt_id,
         )
 
