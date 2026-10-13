@@ -23,11 +23,11 @@ async def async_setup_entry(
 
             entities.append(entity)
 
-            api.register_listener(
+"""            api.register_listener(
                 entity._tt_cu,
                 api._get_function(entity._tt_type),
                 entity._tt_id,
                 entity.handle_event,
             )
-
+"""
     async_add_entities(entities)

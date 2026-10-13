@@ -31,7 +31,7 @@ async def async_setup_entry(
             )
             entities.append(entity)
 
-            _LOGGER.debug(
+"""            _LOGGER.debug(
                 "TT_REGISTER %s id=%s",
                 entity._attr_name,
                 entity._tt_id,
@@ -45,6 +45,6 @@ async def async_setup_entry(
                 entity._tt_id,
                 entity.handle_event,
             )
-    
+"""    
     #add all lights to HA
     async_add_entities(entities)
