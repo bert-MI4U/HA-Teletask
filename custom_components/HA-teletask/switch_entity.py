@@ -25,7 +25,7 @@ class TeletaskSwitch(SwitchEntity):
         )
 
         self._attr_entity_id = (
-            f"switch.{self._attr_unique_id}"
+            f"switch.{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
 
         self._attr_is_on = False
