@@ -328,9 +328,9 @@ class teletask_api:
             tt_id,
         )
 
-        listener = self._listeners.get(key)
+        listeners = self._listeners.get(key, [])
 
-        if listener:
+        for listener in listeners:
             try:
                 listener(
                     tt_cu,
