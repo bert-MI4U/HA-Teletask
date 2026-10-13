@@ -40,7 +40,7 @@ class TeletaskSwitch(SwitchEntity):
 
         _LOGGER.warning(
             "TT_SWITCH_HANDLE_EVENT %s state=%s",
-            self._name,
+            self._attr_name,
             tt_state,
         )
 
@@ -59,7 +59,7 @@ class TeletaskSwitch(SwitchEntity):
         self._attr_is_on = new_state
         _LOGGER.warning(
             "TT_SWITCH_UPDATE %s -> %s",
-            self._name,
+            self._attr_name,
             self._is_on,
         )
         self.async_write_ha_state()
