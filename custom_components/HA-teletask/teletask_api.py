@@ -131,6 +131,31 @@ class teletask_api:
             SET_ON,
         )
         
+        _LOGGER.debug(
+            "TT_ENABLE_LOCMOOD_LOG"
+        )
+        await self.function_log(
+            FNC_LOCMOOD,
+            SET_ON,
+        )
+
+        _LOGGER.debug(
+            "TT_ENABLE_GENMOOD_LOG"
+        )
+        await self.function_log(
+            FNC_GENMOOD,
+            SET_ON,
+        )
+
+        _LOGGER.debug(
+            "TT_ENABLE_FLAG_LOG"
+        )
+        await self.function_log(
+            FNC_FLAG,
+            SET_ON,
+        )
+
+        
     async def function_log(
     #tell Teletask to send events for devices
         self,
