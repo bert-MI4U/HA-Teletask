@@ -1,5 +1,6 @@
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
+    ATTR_RGBW_COLOR,
     ColorMode,
     LightEntity,
 )
@@ -26,12 +27,29 @@ class TeletaskLight(LightEntity):
         
         self._attr_is_on = False
         self._attr_brightness = None
-
+            
         if self._tt_type == "dimmer":
             self._attr_supported_color_modes = {
                 ColorMode.BRIGHTNESS
             }
             self._attr_color_mode = ColorMode.BRIGHTNESS
+        
+        elif self._tt_type == "rgbw":
+            self._channels = config["teletask"]["rgbw_channels"]
+            if len(self._channels) != 4:
+                raise ValueError(
+                    f"{self._attr_name}: rgbw_channels must contain 4 channel ids"
+                )
+            self._r_id, self._g_id, self._b_id, self._w_id = self._channels
+            self._r = 0
+            self._g = 0
+            self._b = 0
+            self._w = 0
+            self._attr_rgbw_color = (0, 0, 0, 0)
+            self._attr_supported_color_modes = {
+                ColorMode.RGBW
+            }
+            self._attr_color_mode = ColorMode.RGBW
         else:
             self._attr_supported_color_modes = {
                 ColorMode.ONOFF
@@ -52,6 +70,35 @@ class TeletaskLight(LightEntity):
             self._attr_unique_id,
             tt_state,
         )
+
+        #convert rgbw state to HA
+        if self._tt_type == "rgbw":
+            level = round((tt_state / 100) * 255)
+
+            if tt_id == self._r_id:
+                self._r = level
+            elif tt_id == self._g_id:
+                self._g = level
+            elif tt_id == self._b_id:
+                self._b = level
+            elif tt_id == self._w_id:
+                self._w = level
+            else:
+                return
+
+            self._attr_rgbw_color = (
+                self._r,
+                self._g,
+                self._b,
+                self._w,
+            )
+
+            self._attr_is_on = any(
+                x > 0 for x in self._attr_rgbw_color
+            )
+
+            self.async_write_ha_state()
+            return
         
         #ignore other devices
         if (
@@ -62,7 +109,7 @@ class TeletaskLight(LightEntity):
             )
         ):
             return
-        
+
         #convert teletask state to HA
         if self._tt_type == "dimmer":
             new_state = tt_state > 0
@@ -129,19 +176,32 @@ class TeletaskLight(LightEntity):
             self._tt_id,
         )
         #request listener
-        self._api.register_listener(
-            self._tt_cu,
-            self._tt_type,
-            self._tt_id,
-            self.handle_event,
-        )
-
-        # Request initial state
-        await self._api.request_state(
-            self._tt_cu,
-            self._tt_type,
-            self._tt_id,
-        )
+        if self._tt_type == "rgbw":
+            for channel in self._channels:
+                self._api.register_listener(
+                    self._tt_cu,
+                    "dimmer",
+                    channel,
+                    self.handle_event,
+                )
+                await self._api.request_state(
+                    self._tt_cu,
+                    "dimmer",
+                    channel,
+                )
+        else:
+            self._api.register_listener(
+                self._tt_cu,
+                self._tt_type,
+                self._tt_id,
+                self.handle_event,
+            )
+            #request initial state
+            await self._api.request_state(
+                self._tt_cu,
+                self._tt_type,
+                self._tt_id,
+            )
 
         # Assign area from config
         room_name = self._config["room"]
@@ -160,6 +220,26 @@ class TeletaskLight(LightEntity):
 
     async def async_turn_on(self, **kwargs):
     #turn on light
+        if self._tt_type == "rgbw":
+
+            rgbw = kwargs.get(
+                ATTR_RGBW_COLOR,
+                self._attr_rgbw_color,
+            )
+
+            for channel, value in zip(
+                self._channels,
+                rgbw,
+            ):
+                await self._api.set_state(
+                    self._tt_cu,
+                    "dimmer",
+                    channel,
+                    round((value / 255) * 100),
+                )
+
+            return
+
         if self._tt_type == "dimmer":
             brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
             level = round((brightness / 255) * 100)
@@ -180,6 +260,17 @@ class TeletaskLight(LightEntity):
         
     async def async_turn_off(self, **kwargs):
     #turn off light
+        if self._tt_type == "rgbw":
+
+            for channel in self._channels:
+                await self._api.set_state(
+                    self._tt_cu,
+                    "dimmer",
+                    channel,
+                    0,
+                )
+            return
+
         await self._api.set_state(
             self._tt_cu,
             self._tt_type,
