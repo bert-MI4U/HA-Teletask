@@ -32,6 +32,7 @@ async def async_setup_entry(
                 asset["name"],
                 entity.entity_id,
             )
+            
             entities.append(entity)
 
     #add all lights to HA

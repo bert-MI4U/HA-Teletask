@@ -63,7 +63,7 @@ class teletask_api:
             tt_id,
         )
 
-        _LOGGER.warning(
+        _LOGGER.info(
             "TT_REGISTER key=%s listener=%s",
             key,
             getattr(listener, "__qualname__", str(listener)),
@@ -74,7 +74,7 @@ class teletask_api:
 
         self._listeners[key].append(listener)
 
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_LISTENERS_REGISTERED=%d",
             len(self._listeners[key]),
         )
