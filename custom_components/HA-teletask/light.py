@@ -25,9 +25,12 @@ async def async_setup_entry(
                 api,
             )
 
+            entity.entity_id = (f"light.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}")
+
             _LOGGER.info(
-                "TT_ADD_ENTITY %s",
+                "TT_ADD_ENTITY %s %s",
                 asset["name"],
+                entity.entity_id,
             )
             entities.append(entity)
 
