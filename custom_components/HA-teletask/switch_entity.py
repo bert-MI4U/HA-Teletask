@@ -20,12 +20,8 @@ class TeletaskSwitch(SwitchEntity):
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
 
-        self._attr_unique_id = (
-            f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
-        )
-        self._attr_entity_id = (
-            f"switch.{self._tt_type}_{self._tt_cu}_{self._tt_id}"
-        )
+        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}" )
+        self._attr_entity_id = (f"switch.tt_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
 
         self._attr_is_on = False
 
@@ -38,9 +34,9 @@ class TeletaskSwitch(SwitchEntity):
     ):
         
         try: 
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "TT_SWITCH_HANDLE_EVENT %s state=%s",
-                self._attr_name,
+                self._attr_entity_id,
                 tt_state,
             )
 
@@ -55,9 +51,9 @@ class TeletaskSwitch(SwitchEntity):
 
             new_state = tt_state != 0
 
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "TT_SWITCH_STATE %s old=%s new=%s",
-                self._attr_name,
+                self._attr_entity_id,
                 self._attr_is_on,
                 new_state,
             )
@@ -66,23 +62,23 @@ class TeletaskSwitch(SwitchEntity):
 
             self.async_write_ha_state()
 
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "TT_SWITCH_WRITTEN %s state=%s",
-                self._attr_name,
+                self._attr_entity_id,
                 self._attr_is_on,
             )
         
         except Exception:
             _LOGGER.exception(
                 "TT_SWITCH_EXCEPTION %s",
-                self._attr_name,
+                self._attr_entity_id,
             )
     
     async def async_added_to_hass(self):
 
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
-            self._attr_name,
+            self._attr_entity_id,
             self._tt_cu,
             self._tt_type,
             self._tt_id,
@@ -113,7 +109,6 @@ class TeletaskSwitch(SwitchEntity):
             )
             
     
-
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(
             self._tt_cu,

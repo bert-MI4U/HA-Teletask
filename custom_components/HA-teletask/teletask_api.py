@@ -131,28 +131,6 @@ class teletask_api:
             SET_ON,
         )
         
-    async def request_state(
-        self,
-        tt_cu,
-        tt_type,
-        tt_id,
-    ):
-    #request Teletask status after initial startup
-    
-        function = self._get_function(tt_type)
-
-        packet = self._build_packet(
-            COMMAND_GET,
-            [
-                tt_cu,
-                function,
-                tt_id >> 8,
-                tt_id & 0xFF,
-            ],
-        )
-
-        await self._send(packet) 
-
     async def function_log(
     #tell Teletask to send events for devices
         self,
@@ -174,37 +152,6 @@ class teletask_api:
         )
 
         await self._send(packet)
-
-    async def disconnect(self):
-
-        if self._keepalive_task:
-            self._keepalive_task.cancel()
-
-        if self._reader_task:
-            self._reader_task.cancel()
-
-        if self.writer:
-            try:
-                self.writer.close()
-                await self.writer.wait_closed()
-            except ConnectionResetError:
-                pass
-        
-        _LOGGER.warning("TT_DISCONNECTED")
-
-    async def _keepalive_loop(self):
-    #every 15seconds a keepalive is sent to Teletask to keep feedback going
-    #if not already waiting for feedback
-
-        while True:
-            await asyncio.sleep(15)
-
-            if self._ack_waiter is None:
-                packet = self._build_packet(
-                    COMMAND_KEEP_ALIVE,
-                    [],
-                )
-                await self._send(packet)
 
     async def _read_loop(self):
     #receive teletask information (bytes)    
@@ -275,6 +222,45 @@ class teletask_api:
             if cur:
                 del buffer[:cur]
 
+    async def _keepalive_loop(self):
+    #every 15seconds a keepalive is sent to Teletask to keep feedback going
+    #if not already waiting for feedback
+
+        while True:
+            await asyncio.sleep(15)
+
+            if self._ack_waiter is None:
+                packet = self._build_packet(
+                    COMMAND_KEEP_ALIVE,
+                    [],
+                )
+                await self._send(packet)
+
+    def _build_packet(
+    #builds packet as required by teletask api
+        self,
+        command,
+        parameters,
+    ):
+
+        packet = bytearray()
+
+        packet.append(STX)
+
+        length = 3 + len(parameters)
+
+        packet.append(length)
+
+        packet.append(command)
+
+        packet.extend(parameters)
+
+        packet.append(
+            self._checksum(packet)
+        )
+
+        return bytes(packet)
+
     async def _process_packet(self, packet):
 
         _LOGGER.debug(
@@ -343,6 +329,61 @@ class teletask_api:
                     "TT_LISTENER_FAILED"
                 )
         
+    async def request_state(
+        self,
+        tt_cu,
+        tt_type,
+        tt_id,
+    ):
+    #request Teletask status after initial startup
+    
+        function = self._get_function(tt_type)
+
+        packet = self._build_packet(
+            COMMAND_GET,
+            [
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
+            ],
+        )
+
+        await self._send(packet) 
+
+    async def set_state(
+    #update information/change state in teletask
+        self,
+        tt_cu,
+        tt_type,
+        tt_id,
+        value,
+    ):
+
+        function = self._get_function(
+            tt_type
+        )
+
+        if tt_type == "dimmer":
+            setting = int(value)
+        else:
+            setting = SET_ON if value else SET_OFF
+        
+        packet = self._build_packet(
+            COMMAND_SET,
+            [
+                tt_cu,
+                function,
+                tt_id >> 8,
+                tt_id & 0xFF,
+                setting,
+            ],
+        )
+
+        await self._send(packet)
+
+        return True
+
     async def _send(self, packet):
 
         async with self._send_lock:
@@ -381,60 +422,20 @@ class teletask_api:
             finally:
                 self._ack_waiter = None
 
-    def _build_packet(
-    #builds packet as required by teletask api
-        self,
-        command,
-        parameters,
-    ):
+    async def disconnect(self):
 
-        packet = bytearray()
+        if self._keepalive_task:
+            self._keepalive_task.cancel()
 
-        packet.append(STX)
+        if self._reader_task:
+            self._reader_task.cancel()
 
-        length = 3 + len(parameters)
-
-        packet.append(length)
-
-        packet.append(command)
-
-        packet.extend(parameters)
-
-        packet.append(
-            self._checksum(packet)
-        )
-
-        return bytes(packet)
-
-    async def set_state(
-    #update information/change state in teletask
-        self,
-        tt_cu,
-        tt_type,
-        tt_id,
-        value,
-    ):
-
-        function = self._get_function(
-            tt_type
-        )
-
-        if tt_type == "dimmer":
-            setting = int(value)
-        else:
-            setting = SET_ON if value else SET_OFF
+        if self.writer:
+            try:
+                self.writer.close()
+                await self.writer.wait_closed()
+            except ConnectionResetError:
+                pass
         
-        packet = self._build_packet(
-            COMMAND_SET,
-            [
-                tt_cu,
-                function,
-                tt_id >> 8,
-                tt_id & 0xFF,
-                setting,
-            ],
-        )
+        _LOGGER.warning("TT_DISCONNECTED")
 
-        await self._send(packet)
-
-        return True

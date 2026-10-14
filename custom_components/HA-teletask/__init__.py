@@ -18,7 +18,7 @@ PLATFORMS = [
     "light",
     "switch",
 ]
-#Do not use Teletask as other integration use the same name.
+#Do not use domain name teletask as other integration use the same name.
 DOMAIN = "ha_teletask"
 
 def register_listener(
@@ -30,31 +30,6 @@ def register_listener(
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})
     return True
-
-async def handle_teletask_event(
-#Read the last teletask action and log (for debugging)
-    hass,
-    tt_cu,
-    tt_type,
-    tt_id,
-    tt_state,
-):
-    _LOGGER.debug("TT_IN_INIT_CALLBACK")
-
-    _LOGGER.debug(
-        "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
-        tt_cu,
-        tt_type,
-        tt_id,
-        tt_state,
-    )
-
-    hass.data[DOMAIN]["last_event"] = {
-        "tt_cu": tt_cu,
-        "tt_type": tt_type,
-        "tt_id": tt_id,
-        "tt_state": tt_state,
-    }
 
 async def async_setup_entry(
 #Called on startup
@@ -105,6 +80,30 @@ async def async_setup_entry(
 
     return True
     
+async def handle_teletask_event(
+#Read the last teletask action and log (for debugging)
+    hass,
+    tt_cu,
+    tt_type,
+    tt_id,
+    tt_state,
+):
+    _LOGGER.debug("TT_IN_INIT_CALLBACK")
+
+    _LOGGER.debug(
+        "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
+        tt_cu,
+        tt_type,
+        tt_id,
+        tt_state,
+    )
+
+    hass.data[DOMAIN]["last_event"] = {
+        "tt_cu": tt_cu,
+        "tt_type": tt_type,
+        "tt_id": tt_id,
+        "tt_state": tt_state,
+    }
 
 async def async_unload_entry(hass, entry):
     """Unload a config entry."""
@@ -116,7 +115,7 @@ async def async_unload_entry(hass, entry):
 
     unload_ok = await hass.config_entries.async_unload_platforms(
         entry,
-        ["light"],
+        PLATFORMS,
     )
 
     return unload_ok
