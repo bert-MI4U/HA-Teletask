@@ -146,6 +146,14 @@ class teletask_api:
             SET_ON,
         )
 
+        _LOGGER.debug(
+            "TT_ENABLE_CONDITION_LOG"
+        )
+        await self.function_log(
+            FNC_COND,
+            SET_ON,
+        )
+
         
     async def function_log(
     #tell Teletask to send events for devices

@@ -118,7 +118,7 @@ class TeletaskLight(LightEntity):
             new_state = tt_state == 255
         _LOGGER.debug(
             "TT_HANDLE_MATCH %s state=%s current=%s",
-            self._attr_name,
+            self._attr_unique_id,
             tt_state,
             self._attr_is_on,
         )
@@ -142,7 +142,7 @@ class TeletaskLight(LightEntity):
             if new_state == self._attr_is_on:
                 _LOGGER.debug(
                     "TT_HANDLE_NO_LIGHT_CHANGE %s state=%s current=%s",
-                    self._attr_name,
+                    self._attr_unique_id,
                     tt_state,
                     self._attr_is_on,
                 )
@@ -161,7 +161,7 @@ class TeletaskLight(LightEntity):
 
         _LOGGER.info(
             "TT_ENTITY_UPDATE %s -> %s",
-            self._attr_name,
+            self._attr_unique_id,
             self._attr_is_on,
         )
         self.async_write_ha_state()
@@ -171,7 +171,7 @@ class TeletaskLight(LightEntity):
 
         _LOGGER.warning(
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
-            self._attr_name,
+            self._attr_unique_id,
             self._tt_cu,
             self._tt_type,
             self._tt_id,

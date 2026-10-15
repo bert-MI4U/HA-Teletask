@@ -35,7 +35,7 @@ class TeletaskSwitch(SwitchEntity):
         try: 
             _LOGGER.debug(
                 "TT_SWITCH_HANDLE_EVENT %s state=%s",
-                self._attr_entity_id,
+                self._attr_unique_id,
                 tt_state,
             )
 
@@ -52,7 +52,7 @@ class TeletaskSwitch(SwitchEntity):
 
             _LOGGER.debug(
                 "TT_SWITCH_STATE %s old=%s new=%s",
-                self._attr_entity_id,
+                self._attr_unique_id,
                 self._attr_is_on,
                 new_state,
             )
@@ -63,21 +63,21 @@ class TeletaskSwitch(SwitchEntity):
 
             _LOGGER.debug(
                 "TT_SWITCH_WRITTEN %s state=%s",
-                self._attr_entity_id,
+                self._attr_unique_id,
                 self._attr_is_on,
             )
         
         except Exception:
             _LOGGER.exception(
                 "TT_SWITCH_EXCEPTION %s",
-                self._attr_entity_id,
+                self._attr_unique_id,
             )
     
     async def async_added_to_hass(self):
 
         _LOGGER.debug(
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
-            self._attr_entity_id,
+            self._attr_unique_id,
             self._tt_cu,
             self._tt_type,
             self._tt_id,
