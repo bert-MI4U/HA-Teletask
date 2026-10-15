@@ -22,7 +22,7 @@
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
         {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-socket-de",
 			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}},
-        {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:power-socket-de",
+        {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:weather-pouring",
 			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
         {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:power-socket-de",
 			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}}

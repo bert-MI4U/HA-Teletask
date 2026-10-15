@@ -23,7 +23,9 @@ class TeletaskBinarySensor(BinarySensorEntity):
         )
 
         self._attr_is_on = False
-
+        # Entity starts unavailable until first state received
+        self._attr_available = False
+        
     def handle_event(
         self,
         tt_cu,
@@ -57,7 +59,14 @@ class TeletaskBinarySensor(BinarySensorEntity):
             )
 
             self._attr_is_on = new_state
-
+            # First successful state received from Teletask
+            self._attr_available = True
+            _LOGGER.debug(
+                "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
+                self._attr_unique_id,
+                self._attr_is_on,
+                self._attr_available,
+            )
             self.async_write_ha_state()
 
         except Exception:
