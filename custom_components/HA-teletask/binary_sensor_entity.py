@@ -71,6 +71,13 @@ class TeletaskBinarySensor(BinarySensorEntity):
 
             self.async_write_ha_state()
 
+            _LOGGER.warning(
+                "TT_ENTITY_WRITTEN %s available=%s state=%s",
+                self.entity_id,
+                self.available,
+                self.is_on,
+            )
+
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_STATE %s old=%s new=%s",
                 self._attr_unique_id,
@@ -104,6 +111,13 @@ class TeletaskBinarySensor(BinarySensorEntity):
             self._tt_cu,
             self._tt_type,
             self._tt_id,
+        )
+
+        _LOGGER.warning(
+            "TT_ENTITY_ADDED %s available=%s state=%s",
+            self.entity_id,
+            self.available,
+            self.is_on,
         )
 
         room_name = self._config["room"]
