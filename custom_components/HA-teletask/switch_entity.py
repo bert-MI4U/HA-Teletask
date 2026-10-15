@@ -1,12 +1,10 @@
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
+from .teletask_const import *
 
 import logging
 _LOGGER = logging.getLogger(__name__)
-
-def _get_function(self, tt_type):
-    return TT_FUNCTIONS[tt_type.lower()]
 
 class TeletaskSwitch(SwitchEntity):
 
@@ -18,7 +16,7 @@ class TeletaskSwitch(SwitchEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
-        self._tt_type_fnc = self._get_function(self._tt_type)
+        self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA

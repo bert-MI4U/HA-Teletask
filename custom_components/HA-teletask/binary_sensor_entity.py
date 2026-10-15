@@ -6,9 +6,6 @@ from .teletask_const import *
 import logging
 _LOGGER = logging.getLogger(__name__)
 
-def _get_function(self, tt_type):
-    return TT_FUNCTIONS[tt_type.lower()]
-
 class TeletaskBinarySensor(BinarySensorEntity):
     def __init__(self, config, api):
         self._api = api
@@ -18,7 +15,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
-        self._tt_type_fnc = self._get_function(self._tt_type)
+        self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
         if self._tt_type in (
             "flag",
             "cond",

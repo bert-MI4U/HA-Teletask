@@ -467,7 +467,7 @@ class teletask_api:
             return
 
         if listener in listeners:
-            _LOGGER.debug("UNREGISTER %s", self.entity_id)
+            _LOGGER.debug("UNREGISTER %s", key)
             listeners.remove(listener)
 
         if not listeners:
