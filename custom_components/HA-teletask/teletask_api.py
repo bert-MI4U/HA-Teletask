@@ -458,6 +458,7 @@ class teletask_api:
             return
 
         if listener in listeners:
+            _LOGGER.debug("UNREGISTER %s", self.entity_id)
             listeners.remove(listener)
 
         if not listeners:
@@ -470,15 +471,25 @@ class teletask_api:
         )
 
     async def disconnect(self):
+        _LOGGER.debug("TT_DISCONNECTING")
+
         self._listeners.clear()
         self._event_callback = None
 
         if self._keepalive_task:
-            self._keepalive_task.cancel()
+            try:
+                self._keepalive_task.cancel()
+                await self._keepalive_task
+            except asyncio.CancelledError
+                pass
 
         if self._reader_task:
-            self._reader_task.cancel()
-
+            try:
+                self._reader_task.cancel()
+                await self._reader_task
+            except asyncio.CancelledError:
+                pass
+            
         if self.writer:
             try:
                 self.writer.close()
@@ -486,7 +497,9 @@ class teletask_api:
             except ConnectionResetError:
                 pass
 
-        self.reader = None
+        self._keepalive_task = None
+        self._reader_task = None
         self.writer = None
+        self._listeners.clear()
 
         _LOGGER.warning("TT_DISCONNECTED")
