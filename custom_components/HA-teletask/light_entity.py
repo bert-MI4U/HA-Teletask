@@ -6,10 +6,13 @@ from homeassistant.components.light import (
 )
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
+from .teletask_const import *
 
 import logging
-
 _LOGGER = logging.getLogger(__name__)
+
+def _get_function(self, tt_type):
+    return TT_FUNCTIONS[tt_type.lower()]
 
 class TeletaskLight(LightEntity):
 
@@ -21,6 +24,7 @@ class TeletaskLight(LightEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
+        self._tt_type_fnc = self._get_function(self._tt_type)
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA
@@ -29,7 +33,7 @@ class TeletaskLight(LightEntity):
         self._attr_is_on = False
         self._attr_brightness = None
             
-        if self._tt_type == "dimmer":
+        if self._tt_type_fnc == FNC_DIMMER:
             self._attr_supported_color_modes = {
                 ColorMode.BRIGHTNESS
             }
@@ -60,7 +64,7 @@ class TeletaskLight(LightEntity):
     def handle_event(
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         tt_state,
     ):
@@ -105,12 +109,12 @@ class TeletaskLight(LightEntity):
         if (
             tt_cu != self._tt_cu
             or tt_id != self._tt_id
-            or tt_type != self._tt_type
+            or tt_type_fnc != self._tt_type_fnc
         ):
             return
 
         #convert teletask state to HA
-        if self._tt_type == "dimmer":
+        if self._tt_type_fnc == FNC_DIMMER:
             new_state = tt_state > 0
         else:
             new_state = tt_state == 255
@@ -121,7 +125,7 @@ class TeletaskLight(LightEntity):
             self._attr_is_on,
         )
         #prevent unnecessary updates 
-        if self._tt_type == "dimmer":
+        if self._tt_type_fnc == FNC_DIMMER:
             new_brightness = round((tt_state / 100) * 255)
 
             if (
@@ -146,7 +150,7 @@ class TeletaskLight(LightEntity):
                 )
                 return
         #update state    
-        if self._tt_type == "dimmer":
+        if self._tt_type_fnc == FNC_DIMMER:
             self._attr_is_on = tt_state > 0
             self._attr_brightness = round((tt_state / 100) * 255)
             _LOGGER.debug(
@@ -179,26 +183,26 @@ class TeletaskLight(LightEntity):
             for channel in self._channels:
                 self._api.register_listener(
                     self._tt_cu,
-                    "dimmer",
+                    FNC_DIMMER,
                     channel,
                     self.handle_event,
                 )
                 await self._api.request_state(
                     self._tt_cu,
-                    "dimmer",
+                    FNC_DIMMER,
                     channel,
                 )
         else:
             self._api.register_listener(
                 self._tt_cu,
-                self._tt_type,
+                self._tt_type_fnc,
                 self._tt_id,
                 self.handle_event,
             )
             #request initial state
             await self._api.request_state(
                 self._tt_cu,
-                self._tt_type,
+                self._tt_type_fnc,
                 self._tt_id,
             )
 
@@ -219,7 +223,7 @@ class TeletaskLight(LightEntity):
     async def async_will_remove_from_hass(self):
         self._api.unregister_listener(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             self.handle_event,
         )
@@ -239,27 +243,27 @@ class TeletaskLight(LightEntity):
             ):
                 await self._api.set_state(
                     self._tt_cu,
-                    "dimmer",
+                    FNC_DIMMER,
                     channel,
                     round((value / 255) * 100),
                 )
 
             return
 
-        if self._tt_type == "dimmer":
+        if self._tt_type_fnc == FNC_DIMMER:
             brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
             level = round((brightness / 255) * 100)
 
             await self._api.set_state(
                 self._tt_cu,
-                self._tt_type,
+                self._tt_type_fnc,
                 self._tt_id,
                 level,
             )
         else:
             await self._api.set_state(
                 self._tt_cu,
-                self._tt_type,
+                self._tt_type_fnc,
                 self._tt_id,
                 True,
             )
@@ -271,7 +275,7 @@ class TeletaskLight(LightEntity):
             for channel in self._channels:
                 await self._api.set_state(
                     self._tt_cu,
-                    "dimmer",
+                    FNC_DIMMER,
                     channel,
                     0,
                 )
@@ -279,7 +283,7 @@ class TeletaskLight(LightEntity):
 
         await self._api.set_state(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             False,
         )

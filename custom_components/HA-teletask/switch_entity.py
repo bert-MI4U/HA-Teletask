@@ -3,9 +3,10 @@ from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
 
 import logging
-
 _LOGGER = logging.getLogger(__name__)
 
+def _get_function(self, tt_type):
+    return TT_FUNCTIONS[tt_type.lower()]
 
 class TeletaskSwitch(SwitchEntity):
 
@@ -17,6 +18,7 @@ class TeletaskSwitch(SwitchEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
+        self._tt_type_fnc = self._get_function(self._tt_type)
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA
@@ -27,7 +29,7 @@ class TeletaskSwitch(SwitchEntity):
     def handle_event(
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         tt_state,
     ):
@@ -42,7 +44,7 @@ class TeletaskSwitch(SwitchEntity):
             if (
                 tt_cu != self._tt_cu
                 or tt_id != self._tt_id
-                or tt_type != self._tt_type
+                or tt_type_fnc != self._tt_type_fnc
             ):
                 return
 
@@ -83,14 +85,14 @@ class TeletaskSwitch(SwitchEntity):
         #request listener
         self._api.register_listener(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             self.handle_event,
         )
         #request initial state
         await self._api.request_state(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
         )
         #assign area from config
@@ -108,7 +110,7 @@ class TeletaskSwitch(SwitchEntity):
     async def async_will_remove_from_hass(self):
         self._api.unregister_listener(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             self.handle_event,
         )
@@ -116,14 +118,14 @@ class TeletaskSwitch(SwitchEntity):
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             True        )
 
     async def async_turn_off(self, **kwargs):
         await self._api.set_state(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             False,
         )

@@ -4,8 +4,10 @@ from homeassistant.helpers import entity_registry as er
 from .teletask_const import *
 
 import logging
-
 _LOGGER = logging.getLogger(__name__)
+
+def _get_function(self, tt_type):
+    return TT_FUNCTIONS[tt_type.lower()]
 
 class TeletaskBinarySensor(BinarySensorEntity):
     def __init__(self, config, api):
@@ -16,6 +18,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
+        self._tt_type_fnc = self._get_function(self._tt_type)
         if self._tt_type in (
             "flag",
             "cond",
@@ -33,7 +36,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
     def handle_event(
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         tt_state,
     ):
@@ -47,7 +50,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
             if (
                 tt_cu != self._tt_cu
                 or tt_id != self._tt_id
-                or tt_type != self._tt_type
+                or tt_type_fnc != self._tt_type_fnc
             ):
                 return
 
@@ -97,20 +100,20 @@ class TeletaskBinarySensor(BinarySensorEntity):
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
             self._attr_unique_id,
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
         )
 
         self._api.register_listener(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             self.handle_event,
         )
 
         await self._api.request_state(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
         )
 
@@ -137,7 +140,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
     async def async_will_remove_from_hass(self):
         self._api.unregister_listener(
             self._tt_cu,
-            self._tt_type,
+            self._tt_type_fnc,
             self._tt_id,
             self.handle_event,
         )

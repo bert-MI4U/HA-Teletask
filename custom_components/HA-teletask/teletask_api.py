@@ -44,13 +44,11 @@ class teletask_api:
     #Create 1 listener for Teletask as it sends all information to all listeners if there are more.
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         listener,
     ):
         
-        tt_type_fnc = self._get_function(tt_type)
-
         key = (
             tt_cu,
             tt_type_fnc,
@@ -161,19 +159,19 @@ class teletask_api:
     async def function_log(
     #tell Teletask to send events for devices
         self,
-        tt_type,
+        tt_type_fnc,
         tt_state,
     ):
         _LOGGER.debug(
             "TT_FUNCTION_LOG fnc=%s state=%s",
-            tt_type,
+            tt_type_fnc,
             tt_state,
         )
 
         packet = self._build_packet(
             COMMAND_LOG,
             [
-                tt_type,
+                tt_type_fnc,
                 tt_state,
             ],
         )
@@ -301,19 +299,19 @@ class teletask_api:
             return
         #get teletask device identity from the packet
         tt_cu = packet[3]
-        tt_type = packet[4]
+        tt_type_fnc = packet[4]
         tt_id = (packet[5] << 8) + packet[6]
         tt_state = packet[8]
 
         #get name for type for logging
-        tt_type_name = TT_FUNCTION_NAMES.get(
-            tt_type,
-            f"unknown({tt_type})"
+        tt_type = TT_FUNCTION_NAMES.get(
+            tt_type_fnc,
+            f"unknown({tt_type_fnc})"
         )
         _LOGGER.info(
             "TT_REPORT cu=%s type=%s id=%s state=%s",
             tt_cu,
-            tt_type_name,
+            tt_type,
             tt_id,
             tt_state,
         )
@@ -326,7 +324,7 @@ class teletask_api:
             try:
                 await self._event_callback(
                     tt_cu,
-                    tt_type,
+                    tt_type_fnc,
                     tt_id,
                     tt_state,
                 )
@@ -338,7 +336,7 @@ class teletask_api:
         #notify listener to update information in HA
         key = (
             tt_cu,
-            tt_type,
+            tt_type_fnc,
             tt_id,
         )
         _LOGGER.debug(
@@ -352,7 +350,7 @@ class teletask_api:
             try:
                 listener(
                     tt_cu,
-                    tt_type,
+                    tt_type_fnc,
                     tt_id,
                     tt_state,
                 )
@@ -364,18 +362,16 @@ class teletask_api:
     async def request_state(
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
     ):
     #request Teletask status after initial startup
     
-        function = self._get_function(tt_type)
-
         packet = self._build_packet(
             COMMAND_GET,
             [
                 tt_cu,
-                function,
+                tt_type_fnc,
                 tt_id >> 8,
                 tt_id & 0xFF,
             ],
@@ -387,16 +383,13 @@ class teletask_api:
     #update information/change state in teletask
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         value,
     ):
 
-        function = self._get_function(
-            tt_type
-        )
 
-        if tt_type == "dimmer":
+        if tt_type_fnc == FNC_DIMMER:
             setting = int(value)
         else:
             setting = SET_ON if value else SET_OFF
@@ -405,7 +398,7 @@ class teletask_api:
             COMMAND_SET,
             [
                 tt_cu,
-                function,
+                tt_type_fnc,
                 tt_id >> 8,
                 tt_id & 0xFF,
                 setting,
@@ -457,12 +450,10 @@ class teletask_api:
     def unregister_listener(
         self,
         tt_cu,
-        tt_type,
+        tt_type_fnc,
         tt_id,
         listener,
     ):
-
-        tt_type_fnc = self._get_function(tt_type)
  
         key = (
             tt_cu,

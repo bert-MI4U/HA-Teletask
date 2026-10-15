@@ -56,11 +56,11 @@ async def async_setup_entry(
     )
     #register callback (Teletask Event -> teletask_api -> handle_teletask_event
     api._event_callback = (
-        lambda tt_cu, tt_type, tt_id, tt_state:
+        lambda tt_cu, tt_type_fnc, tt_id, tt_state:
             handle_teletask_event(
                 hass,
                 tt_cu,
-                tt_type,
+                tt_type_fnc,
                 tt_id,
                 tt_state,
             )
@@ -86,16 +86,16 @@ async def handle_teletask_event(
 #Read the last teletask action and log (for debugging)
     hass,
     tt_cu,
-    tt_type,
+    tt_type_fnc,
     tt_id,
     tt_state,
 ):
     _LOGGER.debug("TT_IN_INIT_CALLBACK")
 
     #get name for type for logging
-    tt_type_name = TT_FUNCTION_NAMES.get(
-        tt_type,
-        f"unknown({tt_type})"
+    tt_type = TT_FUNCTION_NAMES.get(
+        tt_type_fnc,
+        f"unknown({tt_type_fnc})"
     )
     _LOGGER.info(
         "TT_EVENT cu=%s type=%s id=%s state=%s",
@@ -107,7 +107,7 @@ async def handle_teletask_event(
 
     hass.data[DOMAIN]["last_event"] = {
         "tt_cu": tt_cu,
-        "tt_type": tt_type,
+        "tt_type": tt_type_fnc,
         "tt_id": tt_id,
         "tt_state": tt_state,
     }
