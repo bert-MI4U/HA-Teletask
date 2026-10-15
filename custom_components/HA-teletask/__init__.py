@@ -18,6 +18,7 @@ from .teletask_const import *
 PLATFORMS = [
     "light",
     "switch",
+    "binary_sensor",
 ]
 #Do not use domain name teletask as other integration use the same name.
 DOMAIN = "ha_teletask"

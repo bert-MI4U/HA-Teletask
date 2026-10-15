@@ -13,14 +13,11 @@ class TeletaskBinarySensor(BinarySensorEntity):
         self._config = config
 
         self._attr_name = config["name"]
-
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
-
         self._tt_type = config["teletask"]["type"]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-
         self._attr_unique_id = (
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
@@ -37,7 +34,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
         try:
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_HANDLE_EVENT %s state=%s",
-                self.entity_id,
+                self._attr_unique_id,
                 tt_state,
             )
 
@@ -54,7 +51,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
 
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_STATE %s old=%s new=%s",
-                self.entity_id,
+                self._attr_unique_id,
                 self._attr_is_on,
                 new_state,
             )
@@ -66,13 +63,13 @@ class TeletaskBinarySensor(BinarySensorEntity):
         except Exception:
             _LOGGER.exception(
                 "TT_BINARY_SENSOR_EXCEPTION %s",
-                self.entity_id,
+                self._attr_unique_id,
             )
 
     async def async_added_to_hass(self):
         _LOGGER.debug(
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
-            self.entity_id,
+            self._attr_unique_id,
             self._tt_cu,
             self._tt_type,
             self._tt_id,
