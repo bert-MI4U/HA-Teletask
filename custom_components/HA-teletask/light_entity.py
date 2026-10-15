@@ -18,7 +18,8 @@ class TeletaskLight(LightEntity):
         self._config = config
 
         self._attr_name = config["name"]
-        self._attr_icon = config["icon"]
+        if config["icon"] != "default":
+            self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]

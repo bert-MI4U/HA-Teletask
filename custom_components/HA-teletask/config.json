@@ -4,14 +4,10 @@
         "port": 55957
     },
     "assets": [
-        {"name": "HAT-Garage", "component": "light", "device": "TT Garage", "room": "Garage", "icon": "mdi:lightbulb-fluorescent-tube-outline",
-			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
         {"name": "HAT-Bureau", "component": "light", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:light-recessed",
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 43}},
         {"name": "HAT-Boven", "component": "light", "device": "TT Hal", "room": "Hal Boven", "icon": "mdi:light-recessed",
 			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 33}},
-        {"name": "HAT-Wandlicht", "component": "light", "device": "TT Hal", "room": "Bureau", "icon": "mdi:light-recessed",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 36}},
         {"name": "HAT-LedR", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
 			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 41}},
         {"name": "HAT-LedG", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
@@ -25,6 +21,10 @@
         {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:power-socket-de",
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
         {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-socket-de",
-			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}}
+			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}},
+        {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:power-socket-de",
+			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
+        {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:power-socket-de",
+			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}}
  ]
 }

@@ -14,14 +14,13 @@ class TeletaskSwitch(SwitchEntity):
         self._config = config
 
         self._attr_name = config["name"]
-        self._attr_icon = config["icon"]
-
+        if config["icon"] != "default":
+            self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-
+        #Create unique ID for use in HA
         self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}" )
-        self._attr_entity_id = (f"switch.tt_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
 
         self._attr_is_on = False
 

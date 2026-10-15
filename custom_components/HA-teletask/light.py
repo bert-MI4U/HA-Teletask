@@ -5,13 +5,13 @@ _LOGGER = logging.getLogger(__name__)
 #light.py: it reads all configured light assets, 
 #creates a TeletaskLight object for each one, 
 #registers them for TELETASK events, and adds them to Home Assistant
+
 async def async_setup_entry(
     hass,
     entry,
     async_add_entities,
 ):
     data = hass.data["ha_teletask"][entry.entry_id]
-
     api = data["api"]
     config = data["config"]
 
@@ -19,7 +19,6 @@ async def async_setup_entry(
 
     for asset in config["assets"]:
         if asset["component"] == "light":
-
             entity = TeletaskLight(
                 asset,
                 api,
