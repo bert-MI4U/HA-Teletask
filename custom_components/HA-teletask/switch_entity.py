@@ -113,7 +113,7 @@ class TeletaskSwitch(SwitchEntity):
             self._tt_cu,
             self._tt_type,
             self._tt_id,
-            self._handle_event,
+            self.handle_event,
         )
     
     async def async_turn_on(self, **kwargs):
