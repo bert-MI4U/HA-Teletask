@@ -1,4 +1,4 @@
-from .sensor_entity import TeletaskBinarySensor
+from .binary_sensor_entity import TeletaskBinarySensor
 import logging
 
 _LOGGER = logging.getLogger(__name__)
