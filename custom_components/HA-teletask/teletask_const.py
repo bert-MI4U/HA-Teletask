@@ -13,6 +13,8 @@ FNC_TPKEY = 52      #(simulate a key press on an interface)
 FNC_SERVICE = 53    #(control or get the status of a Service function)
 FNC_MESSAGE = 54    #(control or get the status of a Messages or Alarms)
 FNC_COND = 60       #(get the status of a Condition)
+FNC_RGBW = 11       #(dummy for use with HA combining 4 dimmers in one RGBW object)
+
 
 TT_FUNCTIONS = {
     "relay": FNC_RELAY,
@@ -21,7 +23,8 @@ TT_FUNCTIONS = {
     "genmood": FNC_GENMOOD,
     "flag": FNC_FLAG,
     "sensor": FNC_SENSOR,
-    "cond": FNC_COND
+    "cond": FNC_COND,
+    "rgbw": FNC_RGBW,
 }
 
 TT_FUNCTION_NAMES = {
