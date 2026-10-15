@@ -98,8 +98,9 @@ async def handle_teletask_event(
         f"unknown({tt_type_fnc})"
     )
     _LOGGER.info(
-        "TT_EVENT cu=%s type=%s id=%s state=%s",
+        "TT_EVENT cu=%s fnc=%s type=%s id=%s state=%s",
         tt_cu,
+        tt_type_fnc
         tt_type,
         tt_id,
         tt_state,
@@ -107,7 +108,7 @@ async def handle_teletask_event(
 
     hass.data[DOMAIN]["last_event"] = {
         "tt_cu": tt_cu,
-        "tt_type": tt_type_fnc,
+        "tt_type_fnc": tt_type_fnc,
         "tt_id": tt_id,
         "tt_state": tt_state,
     }

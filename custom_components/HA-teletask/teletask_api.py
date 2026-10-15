@@ -309,8 +309,9 @@ class teletask_api:
             f"unknown({tt_type_fnc})"
         )
         _LOGGER.info(
-            "TT_REPORT cu=%s type=%s id=%s state=%s",
+            "TT_REPORT cu=%s fnc=%s type=%s id=%s state=%s",
             tt_cu,
+            tt_type_fnc,
             tt_type,
             tt_id,
             tt_state,
