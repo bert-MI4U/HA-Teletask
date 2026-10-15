@@ -49,7 +49,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
             ):
                 return
 
-             new_state = tt_state != 0
+            new_state = tt_state != 0
 
             _LOGGER.info(
                 "TT_BINARY_SENSOR_UPDATE %s -> %s",
