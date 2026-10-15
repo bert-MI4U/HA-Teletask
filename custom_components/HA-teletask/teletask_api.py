@@ -27,24 +27,6 @@ class teletask_api:
     def _get_function(self, tt_type):
         return TT_FUNCTIONS[tt_type.lower()]
 
-    def _normalize_cu(
-        self,
-        tt_cu,
-        tt_type_fnc,
-    ):
-        """Normalize Central Unit according to TELETASK protocol.
-        Relay, Dimmer, Motor, Sensor and Audio belong to a specific central unit.
-        All other functions must use Central Unit 0 because TELETASK reports them with CU=0.
-        """
-
-        if tt_type_fnc in (
-            FNC_FLAG,
-            FNC_COND,
-        ):
-            return 0
-
-        return tt_cu
-        
     def _log_packet(self, direction, packet):
         _LOGGER.info(
             "%s %s",
@@ -68,10 +50,9 @@ class teletask_api:
     ):
         
         tt_type_fnc = self._get_function(tt_type)
-        tt_cu_norm = self._normalize_cu(tt_cu,tt_type_fnc,)
 
         key = (
-            tt_cu_norm,
+            tt_cu,
             tt_type_fnc,
             tt_id,
         )
@@ -355,10 +336,8 @@ class teletask_api:
                 )
             
         #notify listener to update information in HA
-        tt_cu_norm = self._normalize_cu(tt_cu,tt_type,)
-
         key = (
-            tt_cu_norm,
+            tt_cu,
             tt_type,
             tt_id,
         )
@@ -484,10 +463,9 @@ class teletask_api:
     ):
 
         tt_type_fnc = self._get_function(tt_type)
-        tt_cu_norm = self._normalize_cu(tt_cu,tt_type_fnc,)
  
         key = (
-            tt_cu_norm,
+            tt_cu,
             tt_type_fnc,
             tt_id,
          )

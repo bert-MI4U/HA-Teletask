@@ -1,11 +1,11 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
+from .teletask_const import *
 
 import logging
 
 _LOGGER = logging.getLogger(__name__)
-
 
 class TeletaskBinarySensor(BinarySensorEntity):
     def __init__(self, config, api):
@@ -16,15 +16,18 @@ class TeletaskBinarySensor(BinarySensorEntity):
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
-        self._tt_cu = config["teletask"]["central_unit"]
+        if self._tt_type in (
+            "flag",
+            "cond",
+            ):
+            self._tt_cu = 0
+        else:
+            self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         self._attr_unique_id = (
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
-
         self._attr_is_on = False
-        # Entity starts unavailable until first state received
-        self._attr_available = False
         
     def handle_event(
         self,
@@ -58,7 +61,6 @@ class TeletaskBinarySensor(BinarySensorEntity):
             )
 
             self._attr_is_on = new_state
-            self._attr_available = True
 
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
@@ -68,7 +70,6 @@ class TeletaskBinarySensor(BinarySensorEntity):
             )
 
             self.async_write_ha_state()
-
 
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_STATE %s old=%s new=%s",
@@ -76,17 +77,6 @@ class TeletaskBinarySensor(BinarySensorEntity):
                 self._attr_is_on,
                 new_state,
             )
-
-            self._attr_is_on = new_state
-            # First successful state received from Teletask
-            self._attr_available = True
-            _LOGGER.debug(
-                "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
-                self._attr_unique_id,
-                self._attr_is_on,
-                self._attr_available,
-            )
-            self.async_write_ha_state()
 
         except Exception:
             _LOGGER.exception(
