@@ -100,7 +100,7 @@ async def handle_teletask_event(
     _LOGGER.info(
         "TT_EVENT cu=%s fnc=%s type=%s id=%s state=%s",
         tt_cu,
-        tt_type_fnc
+        tt_type_fnc,
         tt_type,
         tt_id,
         tt_state,
