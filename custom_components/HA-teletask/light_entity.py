@@ -67,14 +67,15 @@ class TeletaskLight(LightEntity):
     ):
 
         _LOGGER.info(
-            "TT_ENTITY_EVENT name=%s tt=%s state=%s",
+            "TT_ENTITY_EVENT name=%s tt=%s fnc=%s state=%s",
             self._attr_name,
             self._attr_unique_id,
+            tt_type_fnc,
             tt_state,
         )
 
         #convert rgbw state to HA
-        if self._tt_type == "rgbw":
+        if self._tt_type_fnc == FNC_RGBW:
             level = round((tt_state / 100) * 255)
 
             if tt_id == self._r_id:
@@ -108,6 +109,7 @@ class TeletaskLight(LightEntity):
             or tt_id != self._tt_id
             or tt_type_fnc != self._tt_type_fnc
         ):
+            _LOGGER.debug("TT_IGNORED")
             return
 
         #convert teletask state to HA
@@ -116,8 +118,9 @@ class TeletaskLight(LightEntity):
         else:
             new_state = tt_state == 255
         _LOGGER.debug(
-            "TT_HANDLE_MATCH %s state=%s current=%s",
+            "TT_HANDLE_MATCH %s fnc=%s state=%s current=%s",
             self._attr_unique_id,
+            tt_type_fnc,
             tt_state,
             self._attr_is_on,
         )
@@ -176,7 +179,7 @@ class TeletaskLight(LightEntity):
             self._tt_id,
         )
         #request listener
-        if self._tt_type == "rgbw":
+        if self._tt_type_fnc == FNC_RGBW:
             for channel in self._channels:
                 self._api.register_listener(
                     self._tt_cu,
