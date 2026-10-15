@@ -28,7 +28,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
         self._attr_is_on = False
-        self._attr_available = True
+        self._attr_available = False
         
     def handle_event(
         self,
@@ -62,6 +62,8 @@ class TeletaskBinarySensor(BinarySensorEntity):
             )
 
             self._attr_is_on = new_state
+            # First successful state received from Teletask
+            self._attr_available = True
 
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
