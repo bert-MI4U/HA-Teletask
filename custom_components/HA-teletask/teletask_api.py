@@ -355,12 +355,18 @@ class teletask_api:
                 )
             
         #notify listener to update information in HA
+        tt_cu_norm = self._normalize_cu(tt_cu,tt_type,)
+
         key = (
-            tt_cu,
+            tt_cu_norm,
             tt_type,
             tt_id,
         )
-
+        _LOGGER.debug(
+            "TT_LOOKUP key=%s",
+            key,
+        )
+        
         listeners = self._listeners.get(key, [])
 
         for listener in listeners:
