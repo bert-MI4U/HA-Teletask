@@ -13,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .teletask_api import teletask_api
+from .teletask_const import *
 
 PLATFORMS = [
     "light",
@@ -90,8 +91,13 @@ async def handle_teletask_event(
 ):
     _LOGGER.debug("TT_IN_INIT_CALLBACK")
 
-    _LOGGER.debug(
-        "TT_EVENT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
+    #get name for type for logging
+    tt_type_name = TT_FUNCTION_NAMES.get(
+        tt_type,
+        f"unknown({tt_type})"
+    )
+    _LOGGER.info(
+        "TT_EVENT cu=%s type=%s id=%s state=%s",
         tt_cu,
         tt_type,
         tt_id,
@@ -108,15 +114,16 @@ async def handle_teletask_event(
 async def async_unload_entry(hass, entry):
     """Unload a config entry."""
 
-    data = hass.data[DOMAIN].pop(entry.entry_id)
-
-    if data.get("api"):
-        await data["api"].disconnect()
-
     unload_ok = await hass.config_entries.async_unload_platforms(
         entry,
         PLATFORMS,
     )
+    
+    if unload_ok:
+        data = hass.data[DOMAIN].pop(entry.entry_id, None)
+
+        if data.get("api"):
+            await data["api"].disconnect()
 
     return unload_ok
     

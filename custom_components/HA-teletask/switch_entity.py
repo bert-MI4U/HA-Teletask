@@ -108,6 +108,13 @@ class TeletaskSwitch(SwitchEntity):
                 area_id=area.id,
             )
             
+    async def async_will_remove_from_hass(self):
+        self._api.unregister_listener(
+            self._tt_cu,
+            self._tt_type,
+            self._tt_id,
+            self._handle_event,
+        )
     
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(

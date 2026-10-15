@@ -6,15 +6,6 @@ from .teletask_const import *
 
 _LOGGER = logging.getLogger(__name__)
 
-TT_FUNCTIONS = {
-    "relay": FNC_RELAY,
-    "dimmer": FNC_DIMMER,
-    "locmood": FNC_LOCMOOD,
-    "genmood": FNC_GENMOOD,
-    "flag": FNC_FLAG,
-}
-
-
 class teletask_api:
 
     def __init__(self, host, port):
@@ -303,10 +294,15 @@ class teletask_api:
         tt_id = (packet[5] << 8) + packet[6]
         tt_state = packet[8]
 
-        _LOGGER.debug(
-            "TT_REPORT tt_cu=%s tt_type=%s tt_id=%s tt_state=%s",
-            tt_cu,
+        #get name for type for logging
+        tt_type_name = TT_FUNCTION_NAMES.get(
             tt_type,
+            f"unknown({tt_type})"
+        )
+        _LOGGER.info(
+            "TT_REPORT cu=%s type=%s id=%s state=%s",
+            tt_cu,
+            tt_type_name,
             tt_id,
             tt_state,
         )
@@ -315,8 +311,6 @@ class teletask_api:
             self.writer.write(bytes([COMMAND_ACK]))
             await self.writer.drain()
 
-        _LOGGER.debug("TT_BEFORE_CALLBACK")
-        
         if self._event_callback:
             try:
                 await self._event_callback(
@@ -331,8 +325,6 @@ class teletask_api:
                 )
             
         #notify listener to update information in HA
-        _LOGGER.debug("TT_BEFORE_LISTENERS")
-
         key = (
             tt_cu,
             tt_type,
@@ -447,7 +439,39 @@ class teletask_api:
             finally:
                 self._ack_waiter = None
 
+    def unregister_listener(
+        self,
+        tt_cu,
+        tt_type,
+        tt_id,
+        listener,
+    ):
+        key = (
+            tt_cu,
+            self._get_function(tt_type),
+            tt_id,
+        )
+
+        listeners = self._listeners.get(key)
+
+        if not listeners:
+            return
+
+        if listener in listeners:
+            listeners.remove(listener)
+
+        if not listeners:
+            self._listeners.pop(key, None)
+
+        _LOGGER.debug(
+            "TT_UNREGISTER key=%s remaining=%s",
+            key,
+            len(self._listeners.get(key, [])),
+        )
+
     async def disconnect(self):
+        self._listeners.clear()
+        self._event_callback = None
 
         if self._keepalive_task:
             self._keepalive_task.cancel()
@@ -461,6 +485,8 @@ class teletask_api:
                 await self.writer.wait_closed()
             except ConnectionResetError:
                 pass
-        
-        _LOGGER.warning("TT_DISCONNECTED")
 
+        self.reader = None
+        self.writer = None
+
+        _LOGGER.warning("TT_DISCONNECTED")

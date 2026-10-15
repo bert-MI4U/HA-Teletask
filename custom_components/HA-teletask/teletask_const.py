@@ -14,6 +14,21 @@ FNC_SERVICE = 53    #(control or get the status of a Service function)
 FNC_MESSAGE = 54    #(control or get the status of a Messages or Alarms)
 FNC_COND = 60       #(get the status of a Condition)
 
+TT_FUNCTIONS = {
+    "relay": FNC_RELAY,
+    "dimmer": FNC_DIMMER,
+    "locmood": FNC_LOCMOOD,
+    "genmood": FNC_GENMOOD,
+    "flag": FNC_FLAG,
+    "sensor": FNC_SENSOR,
+    "cond": FNC_COND
+}
+
+TT_FUNCTION_NAMES = {
+    value: key
+    for key, value in TT_FUNCTIONS.items()
+}
+
 # The Setting can have the following values
 SET_OFF = 0
 SET_TOGGLE = 103

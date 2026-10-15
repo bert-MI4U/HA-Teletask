@@ -21,7 +21,7 @@
         {"name": "HAT-LedW", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
 			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 44}},
         {"name": "HAT-LedRGB", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "rgbw", "central_unit": 1, "teletask_id": 1, "rgbw_channels": 41,42,43,44}},
+			"teletask" :{ "type": "rgbw", "central_unit": 1, "teletask_id": 1, "rgbw_channels": [41,42,43,44]}},
         {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:power-socket-de",
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
         {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-socket-de",
