@@ -480,7 +480,7 @@ class teletask_api:
             try:
                 self._keepalive_task.cancel()
                 await self._keepalive_task
-            except asyncio.CancelledError
+            except asyncio.CancelledError:
                 pass
 
         if self._reader_task:
