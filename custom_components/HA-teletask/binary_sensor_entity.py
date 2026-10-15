@@ -49,7 +49,26 @@ class TeletaskBinarySensor(BinarySensorEntity):
             ):
                 return
 
-            new_state = tt_state != 0
+             new_state = tt_state != 0
+
+            _LOGGER.info(
+                "TT_BINARY_SENSOR_UPDATE %s -> %s",
+                self._attr_unique_id,
+                new_state,
+            )
+
+            self._attr_is_on = new_state
+            self._attr_available = True
+
+            _LOGGER.debug(
+                "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
+                self._attr_unique_id,
+                self._attr_is_on,
+                self._attr_available,
+            )
+
+            self.async_write_ha_state()
+
 
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_STATE %s old=%s new=%s",
