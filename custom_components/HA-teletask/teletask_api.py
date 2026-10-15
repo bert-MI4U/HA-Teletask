@@ -301,8 +301,33 @@ class teletask_api:
         tt_cu = packet[3]
         tt_type_fnc = packet[4]
         tt_id = (packet[5] << 8) + packet[6]
-        tt_state = packet[8]
-
+        # Decode state according to Teletask function type
+        if tt_type_fnc == FNC_SENSOR:
+            # Sensor value is 2 bytes
+            # TDS documentation:
+            # Value = first 2 bytes of sensor payload
+            if len(packet) >= 11:
+                tt_state = {
+                    "value": (packet[8] << 8) + packet[9],
+                    "target": (packet[10] << 8) + packet[11],
+                    "day": (packet[12] << 8) + packet[13],
+                    "night": (packet[14] << 8) + packet[15],
+                    "standby": packet[16],
+                    "preset": packet[17],
+                    "mode": packet[18],
+                    "speed_mode": packet[19],
+                    "power": packet[20],
+                    "frost": packet[21],
+                }
+            else:
+                _LOGGER.warning(
+                    "TT_SENSOR_PACKET_TOO_SHORT %s",
+                    packet,
+                )
+                return
+        else:
+            tt_state = packet[8]
+            
         #get name for type for logging
         tt_type = TT_FUNCTION_NAMES.get(
             tt_type_fnc,

@@ -18,13 +18,15 @@
 			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 44}},
         {"name": "HAT-LedRGB", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
 			"teletask" :{ "type": "rgbw", "central_unit": 1, "teletask_id": 1, "rgbw_channels": [41,42,43,44]}},
-        {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:power-socket-de",
+        {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:toggle-switch-variant",
 			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
-        {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:power-socket-de",
+        {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:lightbulb-group",
 			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}},
         {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:weather-pouring",
 			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
-        {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:power-socket-de",
+        {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:garage-open-variant",
 			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}}
+        {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Keuken", "room": "Keuken", "icon": "mdi:thermometer",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
  ]
 }
