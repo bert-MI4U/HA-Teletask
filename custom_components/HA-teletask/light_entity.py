@@ -104,9 +104,8 @@ class TeletaskLight(LightEntity):
         #ignore other devices
         if (
             tt_cu != self._tt_cu
-            or (
-                tt_id != self._tt_id
-                and tt_type != self._tt_type
+            or tt_id != self._tt_id
+            or tt_type != self._tt_type
             )
         ):
             return
