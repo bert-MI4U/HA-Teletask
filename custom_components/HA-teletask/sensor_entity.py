@@ -117,8 +117,22 @@ class TeletaskSensor(SensorEntity):
                 raw_value
             )
 
+            _LOGGER.warning(
+                "TT_SENSOR_UPDATE id=%s raw=%s value=%s",
+                self._tt_id,
+                raw_value,
+                value,
+            )
+
             self._attr_native_value = value
-            self._attr_available
+            self._attr_available = True
+
+            _LOGGER.warning(
+                "TT_SENSOR_WRITE id=%s available=%s value=%s",
+                self._tt_id,
+                self._attr_available,
+                self._attr_native_value,
+            )
 
             self.async_write_ha_state()
 
