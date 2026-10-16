@@ -120,6 +120,8 @@ class TeletaskSensor(SensorEntity):
             self._attr_native_value = value
             self._attr_available
 
+            self.async_write_ha_state()
+
     async def async_added_to_hass(self):
         self._api.register_listener(
             self._tt_cu,
