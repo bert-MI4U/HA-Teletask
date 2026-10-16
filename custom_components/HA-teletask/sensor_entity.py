@@ -11,32 +11,30 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class TeletaskSensor(SensorEntity):
-    def __init__(self, config, api):
+    def __init__(self, config, api):            
         self._api = api
         self._config = config
 
         self._attr_name = config["name"]
-
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
 
+        self._tt_cu = config["teletask"]["central_unit"]
+        self._tt_id = config["teletask"]["teletask_id"]
+        self._tt_type = config["teletask"]["type"]
+        self._tt_type_fnc = TT_FUNCTIONS[
+            self._tt_type.lower()
+        ]
         self._attr_device_class = config.get("device_class")
         self._attr_native_unit_of_measurement = (
             config.get("unit_of_measurement")
         )
 
-        self._tt_type = config["teletask"]["type"]
-        self._tt_type_fnc = TT_FUNCTIONS[
-            self._tt_type.lower()
-        ]
-
-        self._tt_cu = config["teletask"]["central_unit"]
-        self._tt_id = config["teletask"]["teletask_id"]
-
         self._attr_unique_id = (
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
-
+        
+        self._attr_should_poll = False
         self._attr_available = True
         self._value = None
         self._attr_native_value = None
@@ -133,6 +131,12 @@ class TeletaskSensor(SensorEntity):
                 self._tt_id,
                 self._attr_available,
                 self._attr_native_value,
+            )
+
+            _LOGGER.warning(
+                "TT_SENSOR_FINAL available=%s native_value=%s",
+                self.available,
+                self.native_value,
             )
 
             self.async_write_ha_state()
