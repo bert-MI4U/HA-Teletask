@@ -122,6 +122,11 @@ class TeletaskSensor(SensorEntity):
 
             self.async_write_ha_state()
 
+        except Exception:
+            _LOGGER.exception(
+                "TT_SENSOR_EVENT_FAILED"
+            )
+            
     async def async_added_to_hass(self):
         self._api.register_listener(
             self._tt_cu,
