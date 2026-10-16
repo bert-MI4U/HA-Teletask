@@ -37,8 +37,9 @@ class TeletaskSensor(SensorEntity):
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
 
+        self._attr_available = True
+        self._value = None
         self._attr_native_value = None
-        self._attr_available = False
 
     def _convert_sensor_value(
         self,
