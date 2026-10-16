@@ -25,8 +25,8 @@
         {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:weather-pouring",
 			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
         {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:garage-open-variant",
-			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}}
+			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}},
         {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Keuken", "room": "Keuken", "icon": "mdi:thermometer",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}}
  ]
 }
