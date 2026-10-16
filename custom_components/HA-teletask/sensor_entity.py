@@ -12,6 +12,10 @@ _LOGGER = logging.getLogger(__name__)
 
 class TeletaskSensor(SensorEntity):
     def __init__(self, config, api):            
+        @property
+        def available(self) -> bool:
+            return True
+        
         self._api = api
         self._config = config
 
