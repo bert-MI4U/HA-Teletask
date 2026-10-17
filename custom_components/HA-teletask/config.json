@@ -33,6 +33,8 @@
         {"name": "HAT-regen", "component": "sensor", "device_class": "precipitation_intensity", "unit_of_measurement": "mm","device": "TT Sensors", "room": "Tuin", "icon": "default",
 			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 116}},
         {"name": "HAT-wind", "component": "sensor", "device_class": "wind_speed", "unit_of_measurement": "kn","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}}
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}},
+        {"name": "HAT-luxhal", "component": "sensor", "device_class": "illuminance", "unit_of_measurement": "lx","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 81}}
  ]
 }
