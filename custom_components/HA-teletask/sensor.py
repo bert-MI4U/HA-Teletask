@@ -30,8 +30,6 @@ async def async_setup_entry(
                 f"sensor.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}"
             )
 
-            entity.available = True 
-
             _LOGGER.info(
                 "TT_ADD_ENTITY %s %s",
                 asset["name"],
