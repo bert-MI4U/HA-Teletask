@@ -1,5 +1,5 @@
 from homeassistant.components.climate import (
-    ClimateEntity
+    ClimateEntity,
     ClimateEntityFeature,
 )
 from homeassistant.components.climate.const import (
