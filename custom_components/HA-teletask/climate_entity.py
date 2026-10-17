@@ -176,21 +176,31 @@ class TeletaskClimate(ClimateEntity):
                 self._attr_hvac_mode = HVACMode.AUTO
             #Fan mode
             if tt_state["speed_mode"] == SET_TEMPSPAUTO:
-                self._attr_fan_mode = FAN_AUTO
+                self._attr_fan_mode = "auto"
             elif tt_state["speed_mode"] == SET_TEMPSPLOW:
-                self._attr_fan_mode = FAN_LOW
+                self._attr_fan_mode = "low"
             elif tt_state["speed_mode"] == SET_TEMPSPMED:
-                self._attr_fan_mode = FAN_MEDIUM
+                self._attr_fan_mode = "medium"
             elif tt_state["speed_mode"] == SET_TEMPSPHIGH:
-                self._attr_fan_mode = FAN_HIGH
+                self._attr_fan_mode = "high"
             else:
-                self._attr_fan_mode = FAN_AUTO
-
+                self._attr_fan_mode = "auto"
+            # Preset
+            if tt_state["preset"] == SET_TEMPDAY:
+                self._attr_preset_mode = "day"
+            elif tt_state["preset"] == SET_TEMPNIGHT:
+                self._attr_preset_mode = "night"
+            elif tt_state["preset"] == SET_TEMPSTANDBY:
+                self._attr_preset_mode = "eco"
+            else:
+                self._attr_preset_mode = None
+                
             _LOGGER.warning(
-                "TT_CLIMATE_UPDATE temp=%s target=%s hvac=%s fan=%s",
+                "TT_CLIMATE_UPDATE temp=%s target=%s hvac=%s preset=%s fan=%s",
                 self._attr_current_temperature,
                 self._attr_target_temperature,
                 self._attr_hvac_mode,
+                self._attr_preset_mode,
                 self._attr_fan_mode,
             )
 
