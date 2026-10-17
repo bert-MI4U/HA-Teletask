@@ -314,7 +314,7 @@ class teletask_api:
             # Sensor value is 2 bytes
             # TDS documentation:
             # Value = first 2 bytes of sensor payload
-            if len(packet) >= 22:
+            if len(packet) >= 20:
                 tt_state = {
                     "value": (packet[8] << 8) + packet[9],
                     "target": (packet[10] << 8) + packet[11],

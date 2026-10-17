@@ -89,7 +89,6 @@ class TeletaskClimate(ClimateEntity):
             return
 
         await self._api.set_state(
-            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
@@ -104,7 +103,6 @@ class TeletaskClimate(ClimateEntity):
         }
 
         await self._api.set_state(
-            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
@@ -120,7 +118,6 @@ class TeletaskClimate(ClimateEntity):
         }
 
         await self._api.set_state(
-            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
