@@ -433,6 +433,9 @@ class teletask_api:
         else:
             setting = SET_ON if value else SET_OFF
 
+        if data is not None:
+            parameters.extend(data)
+        
         packet = self._build_packet(
             COMMAND_SET,
             [
