@@ -1,13 +1,17 @@
-from homeassistant.components.climate import ClimateEntity
+from homeassistant.components.climate import (
+    ClimateEntity
+    ClimateEntityFeature,
+)
 from homeassistant.components.climate.const import (
     HVACMode,
-    ClimateEntityFeature,
     HVACAction,
 )
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import (
+    UnitOfTemperature,
+    ATTR_TEMPERATURE,
+)
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
-from homeassistant.const import ATTR_TEMPERATURE
 from .teletask_const import *
 import logging
 
@@ -93,6 +97,7 @@ class TeletaskClimate(ClimateEntity):
             return
 
         await self._api.set_state(
+            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
@@ -107,6 +112,7 @@ class TeletaskClimate(ClimateEntity):
         }
 
         await self._api.set_state(
+            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
@@ -122,6 +128,7 @@ class TeletaskClimate(ClimateEntity):
         }
 
         await self._api.set_state(
+            self,
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
