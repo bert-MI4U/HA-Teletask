@@ -2,6 +2,7 @@ from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     HVACMode,
     ClimateEntityFeature,
+    HVACAction,
 )
 from homeassistant.const import UnitOfTemperature
 from homeassistant.helpers import area_registry as ar
@@ -36,7 +37,24 @@ class TeletaskClimate(ClimateEntity):
 
         self._attr_supported_features = (
             ClimateEntityFeature.TARGET_TEMPERATURE
+            | ClimateEntityFeature.PRESET_MODE
+            | ClimateEntityFeature.FAN_MODE
         )
+
+        self._attr_preset_modes = [
+            "day",
+            "night",
+            "eco",
+        ]
+
+        self._attr_fan_modes = [
+            "auto",
+            "low",
+            "medium",
+            "high",
+        ]
+
+        self._attr_hvac_action = HVACAction.OFF
 
         self._attr_hvac_mode = HVACMode.AUTO
         self._attr_hvac_modes = [
@@ -57,6 +75,73 @@ class TeletaskClimate(ClimateEntity):
     def _temp_to_sensor(self, value):
         return round((value + 273) * 10)
 
+    async def async_set_hvac_mode(self, hvac_mode):
+        mode_map = {
+            HVACMode.AUTO: SET_TEMPAUTO,
+            HVACMode.HEAT: SET_TEMPHEAT,
+            HVACMode.COOL: SET_TEMPCOOL,
+        }
+
+        if hvac_mode == HVACMode.OFF:
+            await self._api.set_state(
+                self._tt_cu,
+                FNC_SENSOR,
+                self._tt_id,
+                SET_TEMPONOFF,
+            )
+            return
+
+        await self._api.set_state(
+            self._tt_cu,
+            FNC_SENSOR,
+            self._tt_id,
+            mode_map[hvac_mode],
+        )
+
+    async def async_set_preset_mode(self, preset_mode):
+        preset_map = {
+            "day": SET_TEMPDAY,
+            "night": SET_TEMPNIGHT,
+            "eco": SET_TEMPSTANDBY,
+        }
+
+        await self._api.set_sensor_command(
+            self._tt_cu,
+            FNC_SENSOR,
+            self._tt_id,
+            preset_map[preset_mode],
+        )
+
+    async def async_set_fan_mode(self, fan_mode):
+        fan_map = {
+            "auto": SET_TEMPSPAUTO,
+            "low": SET_TEMPSPLOW,
+            "medium": SET_TEMPSPMED,
+            "high": SET_TEMPSPHIGH,
+        }
+
+        await self._api.set_sensor_command(
+            self._tt_cu,
+            FNC_SENSOR,
+            self._tt_id,
+            fan_map[fan_mode],
+        )
+    
+    async def async_set_temperature(self, **kwargs):
+        temperature = kwargs.get(ATTR_TEMPERATURE)
+        if temperature is None:
+            return
+
+        tds_value = int((temperature + 273) * 10)
+
+        await self._api.set_state(
+            self._tt_cu,
+            FNC_SENSOR,
+            self._tt_id,
+            SET_TEMPSETDAY,
+            [tds_value >> 8, tds_value & 0xFF],
+        )
+    
     def handle_event(
         self,
         tt_cu,

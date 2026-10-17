@@ -420,14 +420,19 @@ class teletask_api:
         tt_type_fnc,
         tt_id,
         value,
+        data=None,
     ):
-
-
         if tt_type_fnc == FNC_DIMMER:
             setting = int(value)
+
+        elif tt_type_fnc == FNC_SENSOR:
+            # Climate commands are passed as Teletask constants
+            # e.g. SET_TEMPDAY, SET_TEMPHEAT, SET_TEMPSPLOW
+            setting = int(value)
+
         else:
             setting = SET_ON if value else SET_OFF
-        
+
         packet = self._build_packet(
             COMMAND_SET,
             [
