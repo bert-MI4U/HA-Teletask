@@ -29,6 +29,8 @@
         {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Sensors", "room": "Tuin", "icon": "default",
 			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
         {"name": "HAT-w-wellness", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}}
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}},
+        {"name": "HAT-regen", "component": "sensor", "device_class": "precipitation_intensity", "unit_of_measurement": "mm","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 116}}
  ]
 }

@@ -57,15 +57,20 @@ class TeletaskSensor(SensorEntity):
             # Teletask power sensor: raw value x 10 = Watts
                 return raw_value * 10
 
+            if device_class == "precipitation_intensity":
+            # Teletask power sensor: raw value x 10 = Watts
+                return round(raw_value * 100),2)
+
             if device_class == "illuminance":
             # Teletask illuminance: (value /40 ) ^ 10
                 return round(
                     math.pow(10,raw_value / 40,) - 1,1,)
 
             # future:
-            # power
+            # 
             # current
             # precipitation
+            #Don't recalculate
             return raw_value
 
         except Exception:
