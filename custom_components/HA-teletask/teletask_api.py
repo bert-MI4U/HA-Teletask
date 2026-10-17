@@ -22,6 +22,7 @@ class teletask_api:
         self._send_lock = asyncio.Lock()
         self._event_callback = None
         self._listeners = {}
+        self._sensor_states = {}
 
 
     def _get_function(self, tt_type):
@@ -335,7 +336,9 @@ class teletask_api:
                 return
         else:
             tt_state = packet[8]
-            
+        
+        self._sensor_states[(tt_cu, tt_id)] = tt_state
+        
         #get name for type for logging
         tt_type = TT_FUNCTION_NAMES.get(
             tt_type_fnc,
@@ -422,14 +425,23 @@ class teletask_api:
         value,
         data=None,
     ):
-        if tt_type_fnc == FNC_DIMMER:
-            setting = int(value)
-
         elif tt_type_fnc == FNC_SENSOR:
-            # Climate commands are passed as Teletask constants
-            # e.g. SET_TEMPDAY, SET_TEMPHEAT, SET_TEMPSPLOW
             setting = int(value)
 
+            # When switching mode while climate is OFF,
+            # first power the zone ON, then set the mode.
+            if setting in [SET_TEMPHEAT, SET_TEMPCOOL, SET_TEMPAUTO]:
+                state = self._sensor_states.get((tt_cu, tt_id))
+
+                if state and state.get("power", 0) == 0:
+                    await self.set_state(
+                        tt_cu,
+                        FNC_SENSOR,
+                        tt_id,
+                        SET_TEMPONOFF,
+                    )
+                    await asyncio.sleep(0.2)
+                    
         else:
             setting = SET_ON if value else SET_OFF
 
