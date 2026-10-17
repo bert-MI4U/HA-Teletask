@@ -66,6 +66,10 @@ class TeletaskSensor(SensorEntity):
                 return round(
                     math.pow(10,raw_value / 40,) - 1,1,)
 
+            if device_class == "wind_speed":  
+            # Teletask wind speed is transmitted as knots x 10
+                return round(raw_value / 10, 1)
+
             # future:
             # 
             # current

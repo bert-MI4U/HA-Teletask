@@ -31,6 +31,8 @@
         {"name": "HAT-w-wellness", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","device": "TT Sensors", "room": "Tuin", "icon": "default",
 			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}},
         {"name": "HAT-regen", "component": "sensor", "device_class": "precipitation_intensity", "unit_of_measurement": "mm","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 116}}
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 116}},
+        {"name": "HAT-wind", "component": "sensor", "device_class": "wind_speed", "unit_of_measurement": "kn","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}}
  ]
 }
