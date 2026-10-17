@@ -113,5 +113,4 @@ class TeletaskClimate(ClimateEntity):
             self._tt_cu,
             self._tt_type_fnc,
             self._tt_id,
-
-     
+        )
