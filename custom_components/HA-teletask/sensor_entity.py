@@ -38,8 +38,7 @@ class TeletaskSensor(SensorEntity):
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
         
-        self._attr_available = True
-        self._attr_native_value = 0
+        self._attr_native_value = None
 
     def _convert_sensor_value(
         self,
@@ -126,7 +125,6 @@ class TeletaskSensor(SensorEntity):
             )
 
             self._attr_native_value = value
-            self.value = value
             self._attr_available = True
 
             _LOGGER.warning(
@@ -164,21 +162,9 @@ class TeletaskSensor(SensorEntity):
         )
 
         room_name = self._config["room"]
-
-        area_registry = ar.async_get(
-            self.hass
-        )
-
-        entity_registry = er.async_get(
-            self.hass
-        )
-
-        area = (
-            area_registry.async_get_area_by_name(
-                room_name
-            )
-        )
-
+        area_registry = ar.async_get(self.hass)
+        entity_registry = er.async_get(self.hass)
+        area = (area_registry.async_get_area_by_name(room_name))
         if area:
             entity_registry.async_update_entity(
                 self.entity_id,
