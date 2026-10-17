@@ -441,9 +441,12 @@ class teletask_api:
             setting,
         ]
 
-        if data is not None:
+        if isinstance(data, int):
+            parameters.append(data >> 8)
+            parameters.append(data & 0xFF)
+        elif data:
             parameters.extend(data)
-        
+    
         packet = self._build_packet(
             COMMAND_SET,
             parameters,
