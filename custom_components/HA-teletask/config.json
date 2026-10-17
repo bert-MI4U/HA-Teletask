@@ -27,6 +27,8 @@
         {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:garage-open-variant",
 			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}},
         {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}}
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
+        {"name": "HAT-w-wellness", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}}
  ]
 }

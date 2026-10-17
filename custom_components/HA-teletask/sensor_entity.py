@@ -42,15 +42,9 @@ class TeletaskSensor(SensorEntity):
         self,
         raw_value,
     ):
-        """
-        Convert Teletask raw sensor value to HA value.
-
-        Temperature:
-            short / 10 - 273
-
-        Humidity:
-            value = %
-
+"""
+        Temperature: short / 10 - 273
+        Humidity:  value = %
         Lux:
             10^(value/40) - 1
 
@@ -65,22 +59,16 @@ class TeletaskSensor(SensorEntity):
 
         try:
             if device_class == "temperature":
-                return round(
-                    (raw_value / 10) - 273,
-                    1,
-                )
+            # Teletask temperature: Kelvin x 10
+                return round((raw_value / 10) - 273,1,)
 
-            if device_class == "humidity":
-                return raw_value
+            if device_class == "power":
+            # Teletask power sensor: raw value x 10 = Watts
+                return raw_value * 10
 
             if device_class == "illuminance":
                 return round(
-                    math.pow(
-                        10,
-                        raw_value / 40,
-                    ) - 1,
-                    1,
-                )
+                    math.pow(10,raw_value / 40,) - 1,1,)
 
             # future:
             # power
