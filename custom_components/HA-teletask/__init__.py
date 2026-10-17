@@ -20,6 +20,7 @@ PLATFORMS = [
     "switch",
     "binary_sensor",
     "sensor",
+    "climate",
 ]
 #Do not use domain name teletask as other integration use the same name.
 DOMAIN = "ha_teletask"
