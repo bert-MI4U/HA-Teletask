@@ -78,18 +78,19 @@ class TeletaskSensor(SensorEntity):
                     1,
                 )
 
-            if device_class in (
+"""            if device_class in (
                 "power",
-                "precipitation",
-                "wind-speed",
+                "precipitation_intensity",
+                "wind_speed",
             ):
                 return raw_value
-                            
+"""
+            return raw_value
+            
         except Exception:
             _LOGGER.exception(
                 "TT_SENSOR_CONVERSION_FAILED"
             )
-            return raw_value
 
     def handle_event(
         self,
