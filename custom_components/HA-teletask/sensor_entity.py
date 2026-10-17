@@ -70,11 +70,7 @@ class TeletaskSensor(SensorEntity):
             # Teletask wind speed is transmitted as knots x 10
                 return round(raw_value / 10, 1)
 
-            # future:
-            # 
-            # current
-            # precipitation
-            #Don't recalculate
+            #Ohter values don't recalculate
             return raw_value
 
         except Exception:

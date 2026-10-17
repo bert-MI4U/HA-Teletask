@@ -35,6 +35,8 @@
         {"name": "HAT-wind", "component": "sensor", "device_class": "wind_speed", "unit_of_measurement": "kn","device": "TT Sensors", "room": "Tuin", "icon": "default",
 			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}},
         {"name": "HAT-luxhal", "component": "sensor", "device_class": "illuminance", "unit_of_measurement": "lx","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 81}}
- ]
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 81}},
+         {"name": "HAT-Living", "component": "sensor", "device_class": "climate", "unit_of_measurement": "°C","device": "TT Living", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 90}}
+]
 }
