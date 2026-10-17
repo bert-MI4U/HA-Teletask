@@ -25,49 +25,41 @@ class TeletaskClimate(ClimateEntity):
         self._config = config
 
         self._attr_name = config["name"]
-
         if config["icon"] != "default":
             self._attr_icon = config["icon"]
-
         self._tt_type = config["teletask"]["type"]
         self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-
-        self._attr_unique_id = (
-            f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
-        )
+        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
 
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
-
         self._attr_supported_features = (
             ClimateEntityFeature.TARGET_TEMPERATURE
             | ClimateEntityFeature.PRESET_MODE
             | ClimateEntityFeature.FAN_MODE
         )
-
         self._attr_preset_modes = [
             "day",
             "night",
             "eco",
         ]
-
+        self._attr_preset_mode = None
         self._attr_fan_modes = [
             "auto",
             "low",
             "medium",
             "high",
         ]
-
+        self._attr_fan_mode = "auto"
         self._attr_hvac_action = HVACAction.OFF
-
-        self._attr_hvac_mode = HVACMode.AUTO
         self._attr_hvac_modes = [
             HVACMode.AUTO,
             HVACMode.HEAT,
             HVACMode.COOL,
             HVACMode.OFF,
         ]
+        self._attr_hvac_mode = HVACMode.AUTO
 
         self._attr_current_temperature = None
         self._attr_target_temperature = None
