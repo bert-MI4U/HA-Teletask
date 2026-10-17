@@ -84,9 +84,7 @@ class TeletaskSensor(SensorEntity):
                 "wind-speed",
             ):
                 return raw_value
-                
-            return raw_value
-            
+                            
         except Exception:
             _LOGGER.exception(
                 "TT_SENSOR_CONVERSION_FAILED"
