@@ -46,9 +46,14 @@ class TeletaskSensor(SensorEntity):
         """
         Convert Teletask raw sensor value to HA value.
 
-        Temperature:  short / 10 - 273
-        Humidity: value = %
-        Lux: 10^(value/40) - 1
+        Temperature:
+            short / 10 - 273
+
+        Humidity:
+            value = %
+
+        Lux:
+            10^(value/40) - 1
 
         All others:
             raw value
@@ -78,19 +83,17 @@ class TeletaskSensor(SensorEntity):
                     1,
                 )
 
-#            if device_class in (
-#                "power",
-#                "precipitation_intensity",
-#                "wind_speed",
-#            ):
-#                return raw_value
-
+            # future:
+            # power
+            # current
+            # precipitation
             return raw_value
-            
+
         except Exception:
             _LOGGER.exception(
                 "TT_SENSOR_CONVERSION_FAILED"
             )
+            return raw_value
 
     def handle_event(
         self,
