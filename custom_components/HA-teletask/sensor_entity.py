@@ -78,13 +78,13 @@ class TeletaskSensor(SensorEntity):
                     1,
                 )
 
-"""            if device_class in (
-                "power",
-                "precipitation_intensity",
-                "wind_speed",
-            ):
-                return raw_value
-"""
+#            if device_class in (
+#                "power",
+#                "precipitation_intensity",
+#                "wind_speed",
+#            ):
+#                return raw_value
+
             return raw_value
             
         except Exception:
