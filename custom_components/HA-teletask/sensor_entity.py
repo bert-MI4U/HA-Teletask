@@ -37,7 +37,6 @@ class TeletaskSensor(SensorEntity):
         )
         
         self._attr_native_value = None
-        self._attr_available = False
 
     def _convert_sensor_value(
         self,
