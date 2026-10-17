@@ -42,15 +42,6 @@ class TeletaskSensor(SensorEntity):
         self,
         raw_value,
     ):
-"""
-        Temperature: short / 10 - 273
-        Humidity:  value = %
-        Lux:
-            10^(value/40) - 1
-
-        All others:
-            raw value
-        """
 
         device_class = self._config.get(
             "device_class",
@@ -67,6 +58,7 @@ class TeletaskSensor(SensorEntity):
                 return raw_value * 10
 
             if device_class == "illuminance":
+            # Teletask illuminance: (value /40 ) ^ 10
                 return round(
                     math.pow(10,raw_value / 40,) - 1,1,)
 
