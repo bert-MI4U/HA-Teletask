@@ -425,6 +425,9 @@ class teletask_api:
         value,
         data=None,
     ):
+        if tt_type_fnc == FNC_DIMMER:
+            setting = int(value)
+
         elif tt_type_fnc == FNC_SENSOR:
             setting = int(value)
 
@@ -441,7 +444,7 @@ class teletask_api:
                         SET_TEMPONOFF,
                     )
                     await asyncio.sleep(0.2)
-                    
+
         else:
             setting = SET_ON if value else SET_OFF
 
