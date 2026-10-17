@@ -12,10 +12,6 @@ _LOGGER = logging.getLogger(__name__)
 
 class TeletaskSensor(SensorEntity):
 
-    @property
-    def available(self) -> bool:
-        return True
-
     def __init__(self, config, api):            
         
         self._api = api
@@ -127,7 +123,6 @@ class TeletaskSensor(SensorEntity):
             )
 
             self._attr_native_value = value
-            self._attr_available = True
 
             _LOGGER.warning(
                 "TT_SENSOR_WRITE id=%s available=%s value=%s",
