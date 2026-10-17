@@ -314,7 +314,7 @@ class teletask_api:
             # Sensor value is 2 bytes
             # TDS documentation:
             # Value = first 2 bytes of sensor payload
-            if len(packet) >= 11:
+            if len(packet) >= 22:
                 tt_state = {
                     "value": (packet[8] << 8) + packet[9],
                     "target": (packet[10] << 8) + packet[11],
@@ -433,18 +433,20 @@ class teletask_api:
         else:
             setting = SET_ON if value else SET_OFF
 
+        parameters = [
+            tt_cu,
+            tt_type_fnc,
+            tt_id >> 8,
+            tt_id & 0xFF,
+            setting,
+        ]
+
         if data is not None:
             parameters.extend(data)
         
         packet = self._build_packet(
             COMMAND_SET,
-            [
-                tt_cu,
-                tt_type_fnc,
-                tt_id >> 8,
-                tt_id & 0xFF,
-                setting,
-            ],
+            parameters,
         )
 
         await self._send(packet)
