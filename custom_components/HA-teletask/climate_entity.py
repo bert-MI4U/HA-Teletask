@@ -1,14 +1,12 @@
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     HVACMode,
+    ClimateEntityFeature,
 )
 from homeassistant.const import UnitOfTemperature
-
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
-
 from .teletask_const import *
-
 import logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,7 +15,6 @@ _LOGGER = logging.getLogger(__name__)
 class TeletaskClimate(ClimateEntity):
 
     def __init__(self, config, api):
-
         self._api = api
         self._config = config
 
@@ -27,10 +24,7 @@ class TeletaskClimate(ClimateEntity):
             self._attr_icon = config["icon"]
 
         self._tt_type = config["teletask"]["type"]
-        self._tt_type_fnc = TT_FUNCTIONS[
-            self._tt_type.lower()
-        ]
-
+        self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
 
@@ -38,37 +32,30 @@ class TeletaskClimate(ClimateEntity):
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
 
-        self._attr_temperature_unit = (
-            UnitOfTemperature.CELSIUS
+        self._attr_temperature_unit = UnitOfTemperature.CELSIUS
+
+        self._attr_supported_features = (
+            ClimateEntityFeature.TARGET_TEMPERATURE
         )
 
-        self._attr_hvac_mode = HVACMode.HEAT
+        self._attr_hvac_mode = HVACMode.AUTO
         self._attr_hvac_modes = [
+            HVACMode.AUTO,
             HVACMode.HEAT,
+            HVACMode.COOL,
             HVACMode.OFF,
         ]
 
         self._attr_current_temperature = None
         self._attr_target_temperature = None
 
-    # convert teletask sensor value to °C
-    def _sensor_to_temp(
-        self,
-        value,
-    ):
-        return round(
-            (value / 10) - 273,
-            1,
-        )
+    # Teletask raw value -> °C
+    def _sensor_to_temp(self, value):
+        return round((value / 10) - 273, 1)
 
-    # convert °C to teletask sensor value
-    def _temp_to_sensor(
-        self,
-        value,
-    ):
-        return round(
-            (value + 273) * 10
-        )
+    # °C -> Teletask raw value
+    def _temp_to_sensor(self, value):
+        return round((value + 273) * 10)
 
     def handle_event(
         self,
@@ -77,7 +64,6 @@ class TeletaskClimate(ClimateEntity):
         tt_id,
         tt_state,
     ):
-
         if (
             tt_cu != self._tt_cu
             or tt_id != self._tt_id
@@ -86,18 +72,27 @@ class TeletaskClimate(ClimateEntity):
             return
 
         try:
-
-            self._attr_current_temperature = (
-                self._sensor_to_temp(
-                    tt_state["value"]
-                )
+            self._attr_current_temperature = self._sensor_to_temp(
+                tt_state["value"]
             )
 
-            self._attr_target_temperature = (
-                self._sensor_to_temp(
-                    tt_state["target"]
-                )
+            self._attr_target_temperature = self._sensor_to_temp(
+                tt_state["target"]
             )
+
+            # Power state
+            if tt_state["power"] == 0:
+                self._attr_hvac_mode = HVACMode.OFF
+
+            # Operating mode
+            elif tt_state["mode"] == SET_TEMPHEAT:
+                self._attr_hvac_mode = HVACMode.HEAT
+
+            elif tt_state["mode"] == SET_TEMPCOOL:
+                self._attr_hvac_mode = HVACMode.COOL
+
+            else:
+                self._attr_hvac_mode = HVACMode.AUTO
 
             self.async_write_ha_state()
 
@@ -107,7 +102,6 @@ class TeletaskClimate(ClimateEntity):
             )
 
     async def async_added_to_hass(self):
-
         self._api.register_listener(
             self._tt_cu,
             self._tt_type_fnc,
@@ -119,77 +113,4 @@ class TeletaskClimate(ClimateEntity):
             self._tt_cu,
             self._tt_type_fnc,
             self._tt_id,
-        )
-
-        # assign area from config
-        room_name = self._config["room"]
-
-        area_registry = ar.async_get(
-            self.hass
-        )
-
-        entity_registry = er.async_get(
-            self.hass
-        )
-
-        area = (
-            area_registry.async_get_area_by_name(
-                room_name
-            )
-        )
-
-        if area:
-            entity_registry.async_update_entity(
-                self.entity_id,
-                area_id=area.id,
-            )
-
-    async def async_will_remove_from_hass(
-        self,
-    ):
-        self._api.unregister_listener(
-            self._tt_cu,
-            self._tt_type_fnc,
-            self._tt_id,
-            self.handle_event,
-        )
-
-    async def async_set_temperature(
-        self,
-        **kwargs,
-    ):
-
-        temperature = kwargs.get(
-            "temperature"
-        )
-
-        if temperature is None:
-            return
-
-        await self._api.set_sensor_value(
-            self._tt_cu,
-            self._tt_id,
-            SET_TEMPSETDAY,
-            self._temp_to_sensor(
-                temperature
-            ),
-        )
-
-    async def async_set_hvac_mode(
-        self,
-        hvac_mode,
-    ):
-
-        if hvac_mode == HVACMode.OFF:
-            await self._api.set_sensor_command(
-                self._tt_cu,
-                self._tt_id,
-                SET_TEMPONOFF,
-            )
-
-        elif hvac_mode == HVACMode.HEAT:
-            await self._api.set_sensor_command(
-                self._tt_cu,
-                self._tt_id,
-                SET_TEMPDAY,
-            )
+     
