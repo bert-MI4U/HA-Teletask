@@ -32,9 +32,6 @@ class TeletaskClimate(ClimateEntity):
         self._attr_unique_id = (
             f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         )
-        
-        if self._tt_type = "climate":
-            self._tt_type_fnc = FNC_SENSOR
 
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
 
