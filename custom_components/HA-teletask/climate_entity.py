@@ -157,27 +157,42 @@ class TeletaskClimate(ClimateEntity):
             return
 
         try:
+            # Temperature (state and target)
             self._attr_current_temperature = self._sensor_to_temp(
                 tt_state["value"]
             )
-
             self._attr_target_temperature = self._sensor_to_temp(
                 tt_state["target"]
             )
-
             # Power state
             if tt_state["power"] == 0:
                 self._attr_hvac_mode = HVACMode.OFF
-
             # Operating mode
             elif tt_state["mode"] == SET_TEMPHEAT:
                 self._attr_hvac_mode = HVACMode.HEAT
-
             elif tt_state["mode"] == SET_TEMPCOOL:
                 self._attr_hvac_mode = HVACMode.COOL
-
             else:
                 self._attr_hvac_mode = HVACMode.AUTO
+            #Fan mode
+            if tt_state["speed_mode"] == SET_TEMPSPAUTO:
+                self._attr_fan_mode = FAN_AUTO
+            elif tt_state["speed_mode"] == SET_TEMPSPLOW:
+                self._attr_fan_mode = FAN_LOW
+            elif tt_state["speed_mode"] == SET_TEMPSPMED:
+                self._attr_fan_mode = FAN_MEDIUM
+            elif tt_state["speed_mode"] == SET_TEMPSPHIGH:
+                self._attr_fan_mode = FAN_HIGH
+            else:
+                self._attr_fan_mode = FAN_AUTO
+
+            _LOGGER.warning(
+                "TT_CLIMATE_UPDATE temp=%s target=%s hvac=%s fan=%s",
+                self._attr_current_temperature,
+                self._attr_target_temperature,
+                self._attr_hvac_mode,
+                self._attr_fan_mode,
+            )
 
             self.async_write_ha_state()
 
