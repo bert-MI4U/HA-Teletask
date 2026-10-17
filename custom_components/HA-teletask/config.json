@@ -26,7 +26,15 @@
 			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
         {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:garage-open-variant",
 			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}},
-        {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Keuken", "room": "Keuken", "icon": "mdi:thermometer",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}}
+        {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
+        {"name": "HAT-W-Wellness", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}},
+        {"name": "HAT-regen", "component": "sensor", "device_class": "precipitation", "unit_of_measurement": "mm","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 119}},
+        {"name": "HAT-wind", "component": "sensor", "device_class": "wind-speed", "unit_of_measurement": "kn","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}},
+        {"name": "HAT-lux hal", "component": "sensor", "device_class": "illuminance", "unit_of_measurement": "lx","device": "TT Sensors", "room": "Tuin", "icon": "default",
+			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 81}}
  ]
 }
