@@ -105,7 +105,7 @@ class TeletaskClimate(ClimateEntity):
             "eco": SET_TEMPSTANDBY,
         }
 
-        await self._api.set_sensor_command(
+        await self._api.set_state_command(
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
@@ -120,7 +120,7 @@ class TeletaskClimate(ClimateEntity):
             "high": SET_TEMPSPHIGH,
         }
 
-        await self._api.set_sensor_command(
+        await self._api.set_state_command(
             self._tt_cu,
             FNC_SENSOR,
             self._tt_id,
