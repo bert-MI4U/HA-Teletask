@@ -9,18 +9,18 @@ Didn't want the MQTT middleware, wanted more than the integration of Tiemooowh o
 So started from scratch with the help of CoPilot
 
 ## Features
-
+Following Teletask items can be controlled or monitored
 - Control
-	-lights
-	-dimmers
-	-rgbw (4 dimmers combined)
-	-relays, genmood, locmood
-	-climate
--Read
-	-flags
-	-conditions
-	-sensors
-	-
+	- lights
+	- dimmers
+	- rgbw (4 dimmers combined)
+	- relays, genmood, locmood
+	- climate
+- Read
+	- flags
+	- conditions
+	- sensors
+
 
 ## Requirements
 
