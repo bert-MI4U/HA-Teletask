@@ -15,7 +15,7 @@ FNC_MESSAGE = 54    #(control or get the status of a Messages or Alarms)
 FNC_COND = 60       #(get the status of a Condition)
 FNC_RGBW = 11       #(dummy for use with HA combining 4 dimmers in one RGBW object)
 
-
+#lookup to match json words to teletask variables
 TT_FUNCTIONS = {
     "relay": FNC_RELAY,
     "dimmer": FNC_DIMMER,
@@ -27,6 +27,7 @@ TT_FUNCTIONS = {
     "rgbw": FNC_RGBW,
 }
 
+#reverse lookup
 TT_FUNCTION_NAMES = {
     value: key
     for key, value in TT_FUNCTIONS.items()

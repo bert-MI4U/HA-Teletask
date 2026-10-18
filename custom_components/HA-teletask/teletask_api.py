@@ -1,10 +1,24 @@
-#Connect to Teletask controller through api.
+# Teletask communication layer.
+#
+# Responsibilities:
+# - Connect to Teletask DoIP controller
+# - Send commands (SET/GET/LOG)
+# - Receive and validate packets
+# - Maintain keepalive connection
+# - Decode Teletask reports
+# - Route updates to Home Assistant entities
+#
+# All Home Assistant entities register themselves
+# using (tt_cu, tt_type_fnc, tt_id).
+# Incoming reports are dispatched only to matching listeners.
+
+
 import asyncio
 import logging
+_LOGGER = logging.getLogger(__name__)
 
 from .teletask_const import *
 
-_LOGGER = logging.getLogger(__name__)
 
 class teletask_api:
 
@@ -24,9 +38,6 @@ class teletask_api:
         self._listeners = {}
         self._sensor_states = {}
 
-
-    def _get_function(self, tt_type):
-        return TT_FUNCTIONS[tt_type.lower()]
 
     def _log_packet(self, direction, packet):
         _LOGGER.info(
@@ -56,17 +67,14 @@ class teletask_api:
             tt_id,
         )
 
-        _LOGGER.info(
+        _LOGGER.debug(
             "TT_REGISTER key=%s listener=%s",
             key,
             getattr(listener, "__qualname__", str(listener)),
         )
 
-        if key not in self._listeners:
-            self._listeners[key] = []
-
-        self._listeners[key].append(listener)
-
+        self._listeners.setdefault(key, []).append(listener)
+        
         _LOGGER.debug(
             "TT_LISTENERS_REGISTERED=%d",
             len(self._listeners[key]),
@@ -87,18 +95,12 @@ class teletask_api:
             try:
                 task.result()
             except Exception:
-                _LOGGER.exception(
-                    "TT_READER_TASK_CRASHED"
-                )
+                _LOGGER.exception("TT_READER_TASK_CRASHED")
 
-        self._reader_task.add_done_callback(
-            _reader_done
-        )
+        self._reader_task.add_done_callback(_reader_done)
         
         #start keepalive_loop
-        self._keepalive_task = asyncio.create_task(
-            self._keepalive_loop()
-        )
+        self._keepalive_task = asyncio.create_task(self._keepalive_loop())
 
         _LOGGER.info(
             "TT_CONNECTED %s:%s",
@@ -106,87 +108,22 @@ class teletask_api:
             self.port,
         )
         
-        _LOGGER.debug(
-            "TT_ENABLE_RELAY_LOG"
-        )
-
-        await self.function_log(
-            FNC_RELAY,
-            SET_ON,
-        )
-
-        _LOGGER.debug(
-            "TT_ENABLE_DIMMER_LOG"
-        )
-
-        await self.function_log(
-            FNC_DIMMER,
-            SET_ON,
-        )
+        #Tell teletask to send events for following devices
+        _LOGGER.debug("TT_ENABLE_RELAY_LOG")
+        await self.function_log(FNC_RELAY,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_DIMMER_LOG")
+        await self.function_log(FNC_DIMMER,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_LOCMOOD_LOG")
+        await self.function_log(FNC_LOCMOOD,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_GENMOOD_LOG")
+        await self.function_log(FNC_GENMOOD,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_FLAG_LOG")
+        await self.function_log(FNC_FLAG,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_CONDITION_LOG")
+        await self.function_log(FNC_COND,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_SENSOR_LOG")
+        await self.function_log(FNC_SENSOR,SET_ON,)
         
-        _LOGGER.debug(
-            "TT_ENABLE_LOCMOOD_LOG"
-        )
-        await self.function_log(
-            FNC_LOCMOOD,
-            SET_ON,
-        )
-
-        _LOGGER.debug(
-            "TT_ENABLE_GENMOOD_LOG"
-        )
-        await self.function_log(
-            FNC_GENMOOD,
-            SET_ON,
-        )
-
-        _LOGGER.debug(
-            "TT_ENABLE_FLAG_LOG"
-        )
-        await self.function_log(
-            FNC_FLAG,
-            SET_ON,
-        )
-
-        _LOGGER.debug(
-            "TT_ENABLE_CONDITION_LOG"
-        )
-        await self.function_log(
-            FNC_COND,
-            SET_ON,
-        )
-
-        _LOGGER.debug(
-            "TT_ENABLE_SENSOR_LOG"
-        )
-        await self.function_log(
-            FNC_SENSOR,
-            SET_ON,
-        )
-
-        
-    async def function_log(
-    #tell Teletask to send events for devices
-        self,
-        tt_type_fnc,
-        tt_state,
-    ):
-        _LOGGER.debug(
-            "TT_FUNCTION_LOG fnc=%s state=%s",
-            tt_type_fnc,
-            tt_state,
-        )
-
-        packet = self._build_packet(
-            COMMAND_LOG,
-            [
-                tt_type_fnc,
-                tt_state,
-            ],
-        )
-
-        await self._send(packet)
-
     async def _read_loop(self):
     #receive teletask information (bytes)    
         _LOGGER.debug("TT_READLOOP_STARTED")
@@ -270,6 +207,28 @@ class teletask_api:
                 )
                 await self._send(packet)
 
+    async def function_log(
+    #build teletask command to request events
+        self,
+        tt_type_fnc,
+        tt_state,
+    ):
+        _LOGGER.debug(
+            "TT_FUNCTION_LOG fnc=%s state=%s",
+            tt_type_fnc,
+            tt_state,
+        )
+
+        packet = self._build_packet(
+            COMMAND_LOG,
+            [
+                tt_type_fnc,
+                tt_state,
+            ],
+        )
+
+        await self._send(packet)
+
     def _build_packet(
     #builds packet as required by teletask api
         self,
@@ -280,15 +239,10 @@ class teletask_api:
         packet = bytearray()
 
         packet.append(STX)
-
         length = 3 + len(parameters)
-
         packet.append(length)
-
         packet.append(command)
-
         packet.extend(parameters)
-
         packet.append(
             self._checksum(packet)
         )
@@ -315,7 +269,7 @@ class teletask_api:
             # Sensor value is 2 bytes
             # TDS documentation:
             # Value = first 2 bytes of sensor payload
-            if len(packet) >= 20:
+            if len(packet) >= 22:
                 tt_state = {
                     "value": (packet[8] << 8) + packet[9],
                     "target": (packet[10] << 8) + packet[11],
@@ -571,6 +525,5 @@ class teletask_api:
         self._keepalive_task = None
         self._reader_task = None
         self.writer = None
-        self._listeners.clear()
 
         _LOGGER.warning("TT_DISCONNECTED")

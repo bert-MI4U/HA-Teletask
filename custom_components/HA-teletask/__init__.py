@@ -22,16 +22,12 @@ PLATFORMS = [
     "sensor",
     "climate",
 ]
+
 #Do not use domain name teletask as other integration use the same name.
 DOMAIN = "ha_teletask"
 
-def register_listener(
-    self,
-    listener,
-):
-    self._listeners.append(listener)
-
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+#Create hass domain
     hass.data.setdefault(DOMAIN, {})
     return True
 
@@ -126,7 +122,7 @@ async def async_unload_entry(hass, entry):
     if unload_ok:
         data = hass.data[DOMAIN].pop(entry.entry_id, None)
 
-        if data.get("api"):
+        if data and data.get("api"):
             await data["api"].disconnect()
 
     return unload_ok
