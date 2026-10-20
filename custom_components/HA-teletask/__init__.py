@@ -15,6 +15,9 @@ from homeassistant.core import HomeAssistant
 from .teletask_api import teletask_api
 from .teletask_const import *
 
+import shutil
+from pathlib import Path
+
 PLATFORMS = [
     "light",
     "switch",
@@ -41,13 +44,34 @@ async def async_setup_entry(
     
     hass.data.setdefault(DOMAIN, {})
     #Read the configuration json 
-    with open(
-        "/config/custom_components/ha_teletask/config.json",
-        "r",
-        encoding="utf-8",
-    ) as file:
-        config = json.load(file)
+    # User config location (survives HACS updates)
+    config_dir = Path("/config/ha_teletask")
+    config_file = config_dir / "config.json"
 
+    # Default config shipped with integration
+    sample_file = Path("/config/custom_components/ha_teletask/config.sample.json")
+
+    # First startup: create config from sample
+    if not config_file.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
+
+        if sample_file.exists():
+            shutil.copy2(sample_file, config_file)
+            _LOGGER.warning(
+                "TT_CONFIG_MISSING: Created %s from config.sample.json. "
+                "Please review the configuration.",
+                config_file,
+            )
+        else:
+            _LOGGER.error(
+                "TT_CONFIG_MISSING: %s and config.sample.json not found.",
+                config_file,
+            )
+            return False
+
+    # Read configuration
+    with open(config_file, "r", encoding="utf-8") as file:
+        config = json.load(file)
     api = teletask_api(
         config["teletask"]["ip"],
         config["teletask"]["port"],
