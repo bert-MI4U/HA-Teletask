@@ -37,7 +37,7 @@ class TeletaskSensor(SensorEntity):
         # Energy dashboard requires power sensors to be measurements
         if self._attr_device_class in ("power", "energy"):
             self._attr_state_class = SensorStateClass.MEASUREMENT
-    self._attr_native_unit_of_measurement = (
+        self._attr_native_unit_of_measurement = (
             config.get("unit_of_measurement")
         )
         
