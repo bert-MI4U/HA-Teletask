@@ -178,7 +178,7 @@ class TeletaskLight(LightEntity):
 
     async def async_added_to_hass(self):
 
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
             self._attr_unique_id,
             self._tt_cu,
