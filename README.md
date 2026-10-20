@@ -97,6 +97,6 @@ The `teletask_id` corresponds to the function number in Teletask (e.g., Relay 1,
 
 ## License
 
-I'd like to keep the number of forks limited for the time I can still support this Integration.
+Feel free to fork, but drop a PR so we can build one complete integration.
 Feel free to send issues through https://github.com/bert-MI4U/HA-Teletask/issues
 

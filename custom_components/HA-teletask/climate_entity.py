@@ -239,6 +239,20 @@ class TeletaskClimate(ClimateEntity):
             self._tt_id,
         )
 
+        # Assign area from config
+        room_name = self._config["room"]
+
+        area_registry = ar.async_get(self.hass)
+        entity_registry = er.async_get(self.hass)
+
+        area = area_registry.async_get_area_by_name(room_name)
+
+        if area:
+            entity_registry.async_update_entity(
+                self.entity_id,
+                area_id=area.id,
+            )
+
     async def async_will_remove_from_hass(self):
         self._api.unregister_listener(
             self._tt_cu,

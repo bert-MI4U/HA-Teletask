@@ -12,7 +12,10 @@ from .teletask_const import *
 import logging
 _LOGGER = logging.getLogger(__name__)
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorStateClass,
+)
 import math
 
 class TeletaskSensor(SensorEntity):
@@ -31,7 +34,10 @@ class TeletaskSensor(SensorEntity):
         #Create unique ID for use in HA
         self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         self._attr_device_class = config.get("device_class")
-        self._attr_native_unit_of_measurement = (
+        # Energy dashboard requires power sensors to be measurements
+        if self._attr_device_class in ("power", "energy"):
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+    self._attr_native_unit_of_measurement = (
             config.get("unit_of_measurement")
         )
         
