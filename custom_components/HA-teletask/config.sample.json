@@ -1,42 +1,31 @@
 {
     "teletask": {
-        "ip": "192.168.70.30",
+        "ip": "192.168.1.1",
         "port": 55957
     },
     "assets": [
-        {"name": "HAT-Bureau", "component": "light", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:light-recessed",
-			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 43}},
-        {"name": "HAT-Boven", "component": "light", "device": "TT Hal", "room": "Hal Boven", "icon": "mdi:light-recessed",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 33}},
-        {"name": "HAT-LedR", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 41}},
-        {"name": "HAT-LedG", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 42}},
-        {"name": "HAT-LedB", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 43}},
-        {"name": "HAT-LedW", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 44}},
-        {"name": "HAT-LedRGB", "component": "light", "device": "TT Bad", "room": "Badkamer", "icon": "mdi:led-strip",
-			"teletask" :{ "type": "rgbw", "central_unit": 1, "teletask_id": 1, "rgbw_channels": [41,42,43,44]}},
-        {"name": "HAT-Hoek", "component": "switch", "device": "TT Eethoek", "room": "Eethoek", "icon": "mdi:toggle-switch-variant",
-			"teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 25}},
-        {"name": "HAT-Avond", "component": "switch", "device": "TT Bureau", "room": "Bureau", "icon": "mdi:lightbulb-group",
-			"teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 8}},
-        {"name": "HAT-nat", "component": "binary_sensor", "device": "TT weather", "room": "Tuin", "icon": "mdi:weather-pouring",
-			"teletask" :{ "type": "cond", "central_unit": 1, "teletask_id": 2}},
-        {"name": "HAT-PoortOpen", "component": "binary_sensor", "device": "TT Garage", "room": "Garage", "icon": "mdi:garage-open-variant",
-			"teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 3}},
-        {"name": "HAT-keukentemp", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 89}},
-        {"name": "HAT-w-wellness", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}},
-        {"name": "HAT-regen", "component": "sensor", "device_class": "precipitation_intensity", "unit_of_measurement": "mm","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 116}},
-        {"name": "HAT-wind", "component": "sensor", "device_class": "wind_speed", "unit_of_measurement": "kn","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 84}},
-        {"name": "HAT-luxhal", "component": "sensor", "device_class": "illuminance", "unit_of_measurement": "lx","device": "TT Sensors", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 81}},
-         {"name": "HAT-Living", "component": "climate", "device_class": "temperature", "unit_of_measurement": "°C","device": "TT Living", "room": "Tuin", "icon": "default",
-			"teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 90}}
+        {"name": "Garage", "component": "light", "room": "Garage", "icon": "default","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Hal", "component": "light", "room": "Hal", "icon": "mdi:light-recessed","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 2}},
+
+        {"name": "Oprit", "component": "light", "room": "Tuin", "icon": "default","teletask" :{ "type": "locmood", "central_unit": 1, "teletask_id": 5}},
+
+        {"name": "Sauna R", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Sauna G", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 2}},
+        {"name": "Sauna B", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 3}},
+        {"name": "Sauna W", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 4}},
+        {"name": "Sauna RGBW", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "rgbw", "central_unit": 1, "teletask_id": 1, "rgbw_channels": [1,2,3,4]}},
+
+        {"name": "Bureau", "component": "switch", "room": "Bureau", "icon": "mdi:power-socket-de","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
+
+        {"name": "Kerst", "component": "switch", "room": "Garage", "icon": "mdi:lightbulb-group","teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 1}},
+
+        {"name": "Poort open", "component": "binary_sensor", "room": "Garage", "icon": "mdi:thermometer","teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 1}},
+
+        {"name": "Keuken", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","room": "Keuken", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Living", "component": "climate", "device_class": "temperature", "unit_of_measurement": "°C","room": "Living", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 2}},
+        {"name": "Laadpaal binnen", "component": "sensor", "device_class": "power", "unit_of_measurement": "W","room": "Garage", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 3}},
+        {"name": "Lux Hal", "component": "sensor", "device_class": "illuminance", "unit_of_measurement": "lx","room": "Hal", "icon": "default", "teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 4}},
+        {"name": "Wind", "component": "sensor", "device_class": "wind_speed", "unit_of_measurement": "kn","room": "Tuin", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 5}},
+        {"name": "Regen", "component": "sensor", "device_class": "precipitation_intensity", "unit_of_measurement": "mm","room": "Tuin", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 6}}
 ]
 }
