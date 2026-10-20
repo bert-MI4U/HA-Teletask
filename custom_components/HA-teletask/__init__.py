@@ -1,4 +1,4 @@
-"""HA-Teletask integration."""
+#HA-Teletask integration.
 
 #__init__.py is the integration's orchestra conductor: 
 #it loads the configuration, creates the TELETASK connection, 
@@ -12,11 +12,10 @@ _LOGGER = logging.getLogger(__name__)
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from .teletask_api import teletask_api
 from .teletask_const import *
-
-import shutil
-from pathlib import Path
+from .config_manager import async_update_config_from_ha
 
 PLATFORMS = [
     "light",
@@ -95,7 +94,36 @@ async def async_setup_entry(
         "config": config,
         "api": api,
     }
-    
+
+    # Listen for entity registry changes after startup
+    async def handle_entity_registry_update(event):
+        entity_id = event.data.get("entity_id")
+
+        if not entity_id:
+            return
+
+        entity_registry = er.async_get(hass)
+        registry_entry = entity_registry.async_get(entity_id)
+
+        if not registry_entry:
+            return
+
+        unique_id = registry_entry.unique_id
+
+        if not unique_id.startswith("teletask_"):
+            return
+
+        await async_update_config_from_ha(
+            hass,
+            entity_id,
+        )
+
+    entry.async_on_unload(
+        hass.bus.async_listen(
+            "entity_registry_updated",
+            handle_entity_registry_update,
+        )
+    )    
     #load HA platforms
     await hass.config_entries.async_forward_entry_setups(
         entry,
