@@ -1,3 +1,17 @@
+# Home Assistant climate sensor entity.
+#
+# Registers for Teletask events through the API listener
+# mechanism and updates its state when matching events
+# are received.
+#
+# Matching key: central unit,function type,teletask id
+
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import entity_registry as er
+from .teletask_const import *
+import logging
+_LOGGER = logging.getLogger(__name__)
+
 from homeassistant.components.climate import (
     ClimateEntity,
     ClimateEntityFeature,
@@ -10,12 +24,6 @@ from homeassistant.const import (
     UnitOfTemperature,
     ATTR_TEMPERATURE,
 )
-from homeassistant.helpers import area_registry as ar
-from homeassistant.helpers import entity_registry as er
-from .teletask_const import *
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class TeletaskClimate(ClimateEntity):
@@ -31,7 +39,8 @@ class TeletaskClimate(ClimateEntity):
         self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
+        #Create unique ID for use in HA
+        self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
 
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_supported_features = (
@@ -129,7 +138,7 @@ class TeletaskClimate(ClimateEntity):
         if temperature is None:
             return
 
-        tds_value = int((temperature + 273) * 10)
+        tds_value = self._temp_to_sensor(temperature)
 
         await self._api.set_state(
             self._tt_cu,
@@ -146,14 +155,22 @@ class TeletaskClimate(ClimateEntity):
         tt_id,
         tt_state,
     ):
-        if (
-            tt_cu != self._tt_cu
-            or tt_id != self._tt_id
-            or tt_type_fnc != self._tt_type_fnc
-        ):
-            return
 
         try:
+            _LOGGER.debug(
+                "TT_CLIMATE_HANDLE_EVENT %s state=%s",
+                self._attr_unique_id,
+                tt_state,
+            )
+            
+            #match correct sensor
+            if (tt_cu, tt_type_fnc, tt_id) != (
+                self._tt_cu,
+                self._tt_type_fnc,
+                self._tt_id,
+            ):
+                return
+
             # Temperature (state and target)
             self._attr_current_temperature = self._sensor_to_temp(
                 tt_state["value"]
@@ -192,7 +209,7 @@ class TeletaskClimate(ClimateEntity):
             else:
                 self._attr_preset_mode = None
                 
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "TT_CLIMATE_UPDATE temp=%s target=%s hvac=%s preset=%s fan=%s",
                 self._attr_current_temperature,
                 self._attr_target_temperature,
@@ -220,4 +237,12 @@ class TeletaskClimate(ClimateEntity):
             self._tt_cu,
             self._tt_type_fnc,
             self._tt_id,
+        )
+
+    async def async_will_remove_from_hass(self):
+        self._api.unregister_listener(
+            self._tt_cu,
+            self._tt_type_fnc,
+            self._tt_id,
+            self.handle_event,
         )

@@ -1,15 +1,23 @@
+# Home Assistant Light entity.
+#
+# Registers for Teletask events through the API listener
+# mechanism and updates its state when matching events
+# are received.
+#
+# Matching key: central unit,function type,teletask id
+
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import entity_registry as er
+from .teletask_const import *
+import logging
+_LOGGER = logging.getLogger(__name__)
+
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGBW_COLOR,
     ColorMode,
     LightEntity,
 )
-from homeassistant.helpers import area_registry as ar
-from homeassistant.helpers import entity_registry as er
-from .teletask_const import *
-
-import logging
-_LOGGER = logging.getLogger(__name__)
 
 class TeletaskLight(LightEntity):
 
@@ -25,7 +33,7 @@ class TeletaskLight(LightEntity):
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA
-        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}")
+        self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         
         self._attr_is_on = False
         self._attr_brightness = None
@@ -65,109 +73,108 @@ class TeletaskLight(LightEntity):
         tt_id,
         tt_state,
     ):
+        
+        try: 
+            _LOGGER.debug(
+                "TT_LIGHT_HANDLE_EVENT %s state=%s",
+                self._attr_unique_id,
+                tt_state,
+            )
 
-        _LOGGER.info(
-            "TT_ENTITY_EVENT name=%s tt=%s fnc=%s state=%s",
-            self._attr_name,
-            self._attr_unique_id,
-            tt_type_fnc,
-            tt_state,
-        )
+            #convert rgbw state to HA
+            #check rgbw before filtering out the other sensors as this is not a REAL teletask device
+            if self._tt_type_fnc == FNC_RGBW:
+                level = round((tt_state / 100) * 255)
 
-        #convert rgbw state to HA
-        if self._tt_type_fnc == FNC_RGBW:
-            level = round((tt_state / 100) * 255)
+                if tt_id == self._r_id:
+                    self._r = level
+                elif tt_id == self._g_id:
+                    self._g = level
+                elif tt_id == self._b_id:
+                    self._b = level
+                elif tt_id == self._w_id:
+                    self._w = level
+                else:
+                    return
 
-            if tt_id == self._r_id:
-                self._r = level
-            elif tt_id == self._g_id:
-                self._g = level
-            elif tt_id == self._b_id:
-                self._b = level
-            elif tt_id == self._w_id:
-                self._w = level
-            else:
+                self._attr_rgbw_color = (
+                    self._r,
+                    self._g,
+                    self._b,
+                    self._w,
+                )
+
+                self._attr_is_on = any(
+                    x > 0 for x in self._attr_rgbw_color
+                )
+
+                self.async_write_ha_state()
+                return
+            
+            #match correct sensor
+            if (tt_cu, tt_type_fnc, tt_id) != (
+                self._tt_cu,
+                self._tt_type_fnc,
+                self._tt_id,
+            ):
                 return
 
-            self._attr_rgbw_color = (
-                self._r,
-                self._g,
-                self._b,
-                self._w,
-            )
+            #convert teletask state to HA
+            if self._tt_type_fnc == FNC_DIMMER:
+                new_state = tt_state > 0
+            else:
+                new_state = tt_state == 255
 
-            self._attr_is_on = any(
-                x > 0 for x in self._attr_rgbw_color
-            )
+            #prevent unnecessary updates 
+            if self._tt_type_fnc == FNC_DIMMER:
+                new_brightness = round((tt_state / 100) * 255)
 
-            self.async_write_ha_state()
-            return
-        
-        #ignore other devices
-        if (
-            tt_cu != self._tt_cu
-            or tt_id != self._tt_id
-            or tt_type_fnc != self._tt_type_fnc
-        ):
-            _LOGGER.debug("TT_IGNORED")
-            return
-
-        #convert teletask state to HA
-        if self._tt_type_fnc == FNC_DIMMER:
-            new_state = tt_state > 0
-        else:
-            new_state = tt_state == 255
-        _LOGGER.debug(
-            "TT_HANDLE_MATCH %s fnc=%s state=%s current=%s",
-            self._attr_unique_id,
-            tt_type_fnc,
-            tt_state,
-            self._attr_is_on,
-        )
-        #prevent unnecessary updates 
-        if self._tt_type_fnc == FNC_DIMMER:
-            new_brightness = round((tt_state / 100) * 255)
-
-            if (
-                new_state == self._attr_is_on
-                and new_brightness == self._attr_brightness
-            ):
+                if (
+                    new_state == self._attr_is_on
+                    and new_brightness == self._attr_brightness
+                ):
+                    _LOGGER.debug(
+                        "TT_HANDLE_NO_DIMMER_CHANGE state=%s brightness=%s current_state=%s current_brightness=%s",
+                        new_state,
+                        new_brightness,
+                        self._attr_is_on,
+                        self._attr_brightness,
+                    )
+                    return
+            else:
+                if new_state == self._attr_is_on:
+                    _LOGGER.debug(
+                        "TT_HANDLE_NO_LIGHT_CHANGE %s state=%s current=%s",
+                        self._attr_unique_id,
+                        tt_state,
+                        self._attr_is_on,
+                    )
+                    return
+            #update state    
+            if self._tt_type_fnc == FNC_DIMMER:
+                self._attr_is_on = tt_state > 0
+                self._attr_brightness = round((tt_state / 100) * 255)
                 _LOGGER.debug(
-                    "TT_HANDLE_NO_DIMMER_CHANGE state=%s brightness=%s current_state=%s current_brightness=%s",
-                    new_state,
-                    new_brightness,
-                    self._attr_is_on,
+                    "TT_DIMMER_EVENT level=%s brightness=%s",
+                    tt_state,
                     self._attr_brightness,
                 )
-                return
-        else:
-            if new_state == self._attr_is_on:
-                _LOGGER.debug(
-                    "TT_HANDLE_NO_LIGHT_CHANGE %s state=%s current=%s",
-                    self._attr_unique_id,
-                    tt_state,
-                    self._attr_is_on,
-                )
-                return
-        #update state    
-        if self._tt_type_fnc == FNC_DIMMER:
-            self._attr_is_on = tt_state > 0
-            self._attr_brightness = round((tt_state / 100) * 255)
-            _LOGGER.debug(
-                "TT_DIMMER_EVENT level=%s brightness=%s",
-                tt_state,
-                self._attr_brightness,
-            )
-        else:
-            self._attr_is_on = tt_state != 0
+            else:
+                self._attr_is_on = tt_state != 0
 
-        _LOGGER.info(
-            "TT_ENTITY_UPDATE %s -> %s",
-            self._attr_unique_id,
-            self._attr_is_on,
-        )
-        self.async_write_ha_state()
-#        self.schedule_update_ha_state()
+            _LOGGER.info(
+                "TT_LIGHT_UPDATE %s -> %s",
+                self._attr_unique_id,
+                self._attr_is_on,
+            )
+            self.async_write_ha_state()
+    
+        except Exception:
+            _LOGGER.exception(
+                "TT_LIGHT_EVENT_FAILED"
+            )
+
+    
 
     async def async_added_to_hass(self):
 
@@ -219,14 +226,6 @@ class TeletaskLight(LightEntity):
                 self.entity_id,
                 area_id=area.id,
             )
-
-    async def async_will_remove_from_hass(self):
-        self._api.unregister_listener(
-            self._tt_cu,
-            self._tt_type_fnc,
-            self._tt_id,
-            self.handle_event,
-        )
 
     async def async_turn_on(self, **kwargs):
     #turn on light
@@ -287,3 +286,21 @@ class TeletaskLight(LightEntity):
             self._tt_id,
             False,
         )
+
+    async def async_will_remove_from_hass(self):
+        if self._tt_type_fnc == FNC_RGBW:
+            for channel in self._channels:
+                self._api.unregister_listener(
+                    self._tt_cu,
+                    FNC_DIMMER,
+                    channel,
+                    self.handle_event,
+                )
+        else:
+            self._api.unregister_listener(
+                self._tt_cu,
+                self._tt_type_fnc,
+                self._tt_id,
+                self.handle_event,
+            )
+

@@ -1,8 +1,10 @@
+#binary_sensor.py: Reads all configured binary sensors (flag,condition,relay)
+#creates a TeletaskBinarySensor object for each one,
+#registers them for TELETASK events, and adds them to Home Assistant.
+
 from .binary_sensor_entity import TeletaskBinarySensor
 import logging
-
 _LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(
     hass,
@@ -22,9 +24,7 @@ async def async_setup_entry(
                 api,
             )
 
-            entity.entity_id = (
-                f"binary_sensor.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}"
-            )
+            entity.entity_id = (f"binary_sensor.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}")
 
             _LOGGER.info(
                 "TT_ADD_ENTITY %s %s",

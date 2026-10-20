@@ -1,10 +1,18 @@
-from homeassistant.components.switch import SwitchEntity
+# Home Assistant switch entity.
+#
+# Registers for Teletask events through the API listener
+# mechanism and updates its state when matching events
+# are received.
+#
+# Matching key: central unit,function type,teletask id
+
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
 from .teletask_const import *
-
 import logging
 _LOGGER = logging.getLogger(__name__)
+
+from homeassistant.components.switch import SwitchEntity
 
 class TeletaskSwitch(SwitchEntity):
 
@@ -20,7 +28,7 @@ class TeletaskSwitch(SwitchEntity):
         self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA
-        self._attr_unique_id = (f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}" )
+        self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}" 
 
         self._attr_is_on = False
 
@@ -39,30 +47,25 @@ class TeletaskSwitch(SwitchEntity):
                 tt_state,
             )
 
-            if (
-                tt_cu != self._tt_cu
-                or tt_id != self._tt_id
-                or tt_type_fnc != self._tt_type_fnc
+            #match correct sensor
+            if (tt_cu, tt_type_fnc, tt_id) != (
+                self._tt_cu,
+                self._tt_type_fnc,
+                self._tt_id,
             ):
                 return
 
             new_state = tt_state != 0
 
-            _LOGGER.debug(
-                "TT_SWITCH_STATE %s old=%s new=%s",
-                self._attr_unique_id,
-                self._attr_is_on,
-                new_state,
-            )
-
+            old_state = self._attr_is_on
             self._attr_is_on = new_state
-
             self.async_write_ha_state()
 
             _LOGGER.debug(
-                "TT_SWITCH_WRITTEN %s state=%s",
+                "TT_SWITCH_STATE UPDATE %s old=%s new=%s",
                 self._attr_unique_id,
-                self._attr_is_on,
+                old_state,
+                new_state,
             )
         
         except Exception:
@@ -105,14 +108,6 @@ class TeletaskSwitch(SwitchEntity):
                 area_id=area.id,
             )
             
-    async def async_will_remove_from_hass(self):
-        self._api.unregister_listener(
-            self._tt_cu,
-            self._tt_type_fnc,
-            self._tt_id,
-            self.handle_event,
-        )
-    
     async def async_turn_on(self, **kwargs):
         await self._api.set_state(
             self._tt_cu,
@@ -127,3 +122,12 @@ class TeletaskSwitch(SwitchEntity):
             self._tt_id,
             False,
         )
+        
+    async def async_will_remove_from_hass(self):
+        self._api.unregister_listener(
+            self._tt_cu,
+            self._tt_type_fnc,
+            self._tt_id,
+            self.handle_event,
+        )
+    

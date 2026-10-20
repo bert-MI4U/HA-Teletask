@@ -1,10 +1,10 @@
-from .switch_entity import TeletaskSwitch
-import logging
-_LOGGER = logging.getLogger(__name__)
-
 #switch.py: it reads all configured switches, 
 #creates a TeletaskSwitch object for each one, 
 #registers them for TELETASK events, and adds them to Home Assistant
+
+from .switch_entity import TeletaskSwitch
+import logging
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass,
@@ -34,5 +34,4 @@ async def async_setup_entry(
 
             entities.append(entity)
 
-    #add all switches to HA
     async_add_entities(entities)

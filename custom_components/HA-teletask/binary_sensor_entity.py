@@ -1,12 +1,21 @@
-from homeassistant.components.binary_sensor import BinarySensorEntity
+# Home Assistant binary sensor entity.
+#
+# Registers for Teletask events through the API listener
+# mechanism and updates its state when matching events
+# are received.
+#
+# Matching key: central unit,function type,teletask id
+
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import entity_registry as er
 from .teletask_const import *
-
 import logging
 _LOGGER = logging.getLogger(__name__)
 
+from homeassistant.components.binary_sensor import BinarySensorEntity
+
 class TeletaskBinarySensor(BinarySensorEntity):
+
     def __init__(self, config, api):
         self._api = api
         self._config = config
@@ -24,9 +33,8 @@ class TeletaskBinarySensor(BinarySensorEntity):
         else:
             self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
-        self._attr_unique_id = (
-            f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
-        )
+        #Create unique ID for use in HA
+        self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"
         self._attr_is_on = False
         self._attr_available = False
         
@@ -37,6 +45,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
         tt_id,
         tt_state,
     ):
+
         try:
             _LOGGER.debug(
                 "TT_BINARY_SENSOR_HANDLE_EVENT %s state=%s",
@@ -44,45 +53,25 @@ class TeletaskBinarySensor(BinarySensorEntity):
                 tt_state,
             )
 
-            if (
-                tt_cu != self._tt_cu
-                or tt_id != self._tt_id
-                or tt_type_fnc != self._tt_type_fnc
+            #match correct sensor
+            if (tt_cu, tt_type_fnc, tt_id) != (
+                self._tt_cu,
+                self._tt_type_fnc,
+                self._tt_id,
             ):
                 return
 
             new_state = tt_state != 0
-
-            _LOGGER.info(
-                "TT_BINARY_SENSOR_UPDATE %s -> %s",
-                self._attr_unique_id,
-                new_state,
-            )
-
+            old_state = self._attr_is_on
             self._attr_is_on = new_state
             # First successful state received from Teletask
             self._attr_available = True
-
-            _LOGGER.debug(
-                "TT_BINARY_SENSOR_PUBLISH %s state=%s available=%s",
-                self._attr_unique_id,
-                self._attr_is_on,
-                self._attr_available,
-            )
-
             self.async_write_ha_state()
 
-            _LOGGER.warning(
-                "TT_ENTITY_WRITTEN %s available=%s state=%s",
-                self.entity_id,
-                self.available,
-                self.is_on,
-            )
-
             _LOGGER.debug(
-                "TT_BINARY_SENSOR_STATE %s old=%s new=%s",
+                "TT_BINARY_SENSOR_STATE UPDATED %s old=%s new=%s",
                 self._attr_unique_id,
-                self._attr_is_on,
+                old_state,
                 new_state,
             )
 
@@ -93,13 +82,6 @@ class TeletaskBinarySensor(BinarySensorEntity):
             )
 
     async def async_added_to_hass(self):
-        _LOGGER.debug(
-            "TT_REGISTER_ENTITY %s cu=%s type=%s id=%s",
-            self._attr_unique_id,
-            self._tt_cu,
-            self._tt_type_fnc,
-            self._tt_id,
-        )
 
         self._api.register_listener(
             self._tt_cu,
@@ -114,18 +96,17 @@ class TeletaskBinarySensor(BinarySensorEntity):
             self._tt_id,
         )
 
-        _LOGGER.warning(
+        _LOGGER.debug(
             "TT_ENTITY_ADDED %s available=%s state=%s",
             self.entity_id,
             self.available,
             self.is_on,
         )
 
+        #add entity to the correct area
         room_name = self._config["room"]
-
         area_registry = ar.async_get(self.hass)
         entity_registry = er.async_get(self.hass)
-
         area = area_registry.async_get_area_by_name(room_name)
 
         if area:

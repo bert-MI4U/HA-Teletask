@@ -1,12 +1,10 @@
+#sensor.py: it reads all configured (analog) sensor assets, 
+#creates a TeletaskSensro object for each one, 
+#registers them for TELETASK events, and adds them to Home Assistant
+
 from .sensor_entity import TeletaskSensor
 import logging
-
 _LOGGER = logging.getLogger(__name__)
-
-# sensor.py:
-# Reads all configured sensors,
-# creates a TeletaskSensor object for each one,
-# and adds them to Home Assistant.
 
 async def async_setup_entry(
     hass,
@@ -26,9 +24,7 @@ async def async_setup_entry(
                 api,
             )
 
-            entity.entity_id = (
-                f"sensor.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}"
-            )
+            entity.entity_id = (f"sensor.tt_{entity._tt_type}_{entity._tt_cu}_{entity._tt_id}")
 
             _LOGGER.info(
                 "TT_ADD_ENTITY %s %s",
