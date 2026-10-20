@@ -43,6 +43,7 @@ Following Teletask items can be controlled or monitored
 
 All teletask entities to be added to HA can be configured in the config.json file. 
 Use Studio Code Server for easy editing
+Safe the config.json file in /config/ha_teletask/config.json (outside of custom_components)
 
 ### Basic example
 
