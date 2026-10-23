@@ -16,6 +16,7 @@ from homeassistant.helpers import entity_registry as er
 from .teletask_api import teletask_api
 from .teletask_const import *
 from .config_manager import async_update_config_from_ha
+from pathlib import Path
 
 PLATFORMS = [
     "light",
@@ -97,6 +98,12 @@ async def async_setup_entry(
 
     # Listen for entity registry changes after startup
     async def handle_entity_registry_update(event):
+
+        _LOGGER.warning(
+            "TT_REGISTRY_EVENT: %s",
+            event.data,
+        )
+
         entity_id = event.data.get("entity_id")
 
         if not entity_id:
@@ -106,7 +113,17 @@ async def async_setup_entry(
         registry_entry = entity_registry.async_get(entity_id)
 
         if not registry_entry:
+            _LOGGER.warning(
+                "TT_REGISTRY_ENTITY_NOT_FOUND: %s",
+                entity_id,
+            )
             return
+
+        _LOGGER.warning(
+            "TT_REGISTRY_UPDATE: entity=%s unique_id=%s",
+            entity_id,
+            registry_entry.unique_id,
+        )
 
         unique_id = registry_entry.unique_id
 
@@ -117,6 +134,10 @@ async def async_setup_entry(
             hass,
             entity_id,
         )
+
+    _LOGGER.warning(
+        "TT_REGISTERING_ENTITY_REGISTRY_LISTENER"
+    )
 
     entry.async_on_unload(
         hass.bus.async_listen(
