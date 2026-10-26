@@ -116,7 +116,9 @@ class teletask_api:
         _LOGGER.debug("TT_ENABLE_LOCMOOD_LOG")
         await self.function_log(FNC_LOCMOOD,SET_ON,)
         _LOGGER.debug("TT_ENABLE_GENMOOD_LOG")
-        await self.function_log(FNC_GENMOOD,SET_ON,)
+        await self.function_log(FNC_LOCMOOD,SET_ON,)
+        _LOGGER.debug("TT_ENABLE_TIMEDMOOD_LOG")
+        await self.function_log(FNC_TIMEDMOOD,SET_ON,)
         _LOGGER.debug("TT_ENABLE_FLAG_LOG")
         await self.function_log(FNC_FLAG,SET_ON,)
         _LOGGER.debug("TT_ENABLE_CONDITION_LOG")
@@ -498,9 +500,6 @@ class teletask_api:
     async def disconnect(self):
         _LOGGER.debug("TT_DISCONNECTING")
 
-        self._listeners.clear()
-        self._event_callback = None
-
         if self._keepalive_task:
             try:
                 self._keepalive_task.cancel()
@@ -522,6 +521,8 @@ class teletask_api:
             except ConnectionResetError:
                 pass
 
+        self._listeners.clear()
+        self._event_callback = None
         self._keepalive_task = None
         self._reader_task = None
         self.writer = None
