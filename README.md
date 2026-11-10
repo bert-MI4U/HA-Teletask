@@ -69,10 +69,10 @@ A sample config.json file is included in the download (config.sample.json)
 
 | Parameter        | Type    | Required | Description                                                                 |
 | ---------------- | ------- | -------- | --------------------------------------------------------------------------- |
-| `type`           | String  | Yes      | Teletask component type: `relay`, `locmood`, `genmood`, `flag`, `cond`,     |
-|                  |         |          | `dimmer`, `sensor`                                                          |
-| `central_unit`   | Integer | Yes      | 0 for genmood, flag, condition, regime, process, service, message           | 
-|                  |         |          | or the ID of the central unit for relay,dimmer,motor,sensor and audio       |
+| `type`           | String  | Yes      | Teletask component type: `relay, locmood, genmood, flag, cond, dimmer,`     |
+|                  |         |          | `sensor`                                                                    |
+| `central_unit`   | Integer | Yes      | 0 for `genmood, flag, condition, regime, process, service, message`         | 
+|                  |         |          | or the ID of the central unit for `relay,dimmer,motor,sensor and audio`     |
 | `teletask_id`    | Integer | Yes      | Teletask component id                                                       |
 
 ## Finding your Teletask addresses
