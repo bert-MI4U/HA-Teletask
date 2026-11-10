@@ -89,12 +89,6 @@ The `teletask_id` corresponds to the function number in Teletask (e.g., Relay 1,
 - Home Assistant 2026.x
 - Teletask NANOS central unit
 
-## Credits
-
-- Original integration by [@Tiemooowh](https://github.com/Tiemooowh)
-- Maintained by [@dsmagghe](https://github.com/dsmagghe)
-- Based on the [pyteletask](https://pypi.org/project/pyteletask/) library
-
 ## License
 
 Feel free to fork, but drop a PR so we can build one complete integration.
