@@ -25,13 +25,7 @@ class TeletaskBinarySensor(BinarySensorEntity):
             self._attr_icon = config["icon"]
         self._tt_type = config["teletask"]["type"]
         self._tt_type_fnc = TT_FUNCTIONS[self._tt_type.lower()]
-        if self._tt_type in (
-            "flag",
-            "cond",
-            ):
-            self._tt_cu = 0
-        else:
-            self._tt_cu = config["teletask"]["central_unit"]
+        self._tt_cu = config["teletask"]["central_unit"]
         self._tt_id = config["teletask"]["teletask_id"]
         #Create unique ID for use in HA
         self._attr_unique_id = f"teletask_{self._tt_type}_{self._tt_cu}_{self._tt_id}"

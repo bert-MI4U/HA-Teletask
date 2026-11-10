@@ -339,6 +339,12 @@ class teletask_api:
         
         listeners = self._listeners.get(key, [])
 
+        _LOGGER.debug(
+            "TT_LOOKUP_RESULT key=%s listeners=%s",
+            key,
+            len(listeners),
+        )
+
         for listener in listeners:
             try:
                 listener(

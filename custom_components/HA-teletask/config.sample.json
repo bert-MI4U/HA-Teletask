@@ -7,7 +7,7 @@
         {"name": "Garage", "component": "light", "room": "Garage", "icon": "default","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
         {"name": "Hal", "component": "light", "room": "Hal", "icon": "mdi:light-recessed","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 2}},
 
-        {"name": "Oprit", "component": "light", "room": "Tuin", "icon": "default","teletask" :{ "type": "locmood", "central_unit": 1, "teletask_id": 5}},
+        {"name": "Oprit", "component": "light", "room": "Tuin", "icon": "default","teletask" :{ "type": "locmood", "central_unit": 0, "teletask_id": 5}},
 
         {"name": "Sauna R", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 1}},
         {"name": "Sauna G", "component": "light", "room": "Wellness", "icon": "mdi:led-strip","teletask" :{ "type": "dimmer", "central_unit": 1, "teletask_id": 2}},
@@ -17,9 +17,9 @@
 
         {"name": "Bureau", "component": "switch", "room": "Bureau", "icon": "mdi:power-socket-de","teletask" :{ "type": "relay", "central_unit": 1, "teletask_id": 1}},
 
-        {"name": "Kerst", "component": "switch", "room": "Garage", "icon": "mdi:lightbulb-group","teletask" :{ "type": "genmood", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Kerst", "component": "switch", "room": "Garage", "icon": "mdi:lightbulb-group","teletask" :{ "type": "genmood", "central_unit": 0, "teletask_id": 1}},
 
-        {"name": "Poort open", "component": "binary_sensor", "room": "Garage", "icon": "mdi:thermometer","teletask" :{ "type": "flag", "central_unit": 1, "teletask_id": 1}},
+        {"name": "Poort open", "component": "binary_sensor", "room": "Garage", "icon": "mdi:thermometer","teletask" :{ "type": "flag", "central_unit": 0, "teletask_id": 1}},
 
         {"name": "Keuken", "component": "sensor", "device_class": "temperature", "unit_of_measurement": "°C","room": "Keuken", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 1}},
         {"name": "Living", "component": "climate", "device_class": "temperature", "unit_of_measurement": "°C","room": "Living", "icon": "default","teletask" :{ "type": "sensor", "central_unit": 1, "teletask_id": 2}},
