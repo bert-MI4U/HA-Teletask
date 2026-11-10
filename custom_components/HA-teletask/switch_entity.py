@@ -55,6 +55,14 @@ class TeletaskSwitch(SwitchEntity):
             ):
                 return
 
+            _LOGGER.warning(
+                "TT_SWITCH_EVENT name=%s type=%s id=%s state=%s",
+                self._attr_name,
+                self._tt_type,
+                self._tt_id,
+                tt_state,
+            )
+
             new_state = tt_state != 0
 
             old_state = self._attr_is_on

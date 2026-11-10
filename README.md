@@ -6,7 +6,7 @@ Home built integration to integrate [Teletask](https://www.teletask.be/) in [Hom
 
 I got the inspiration from the original builds of Tiemooowh (https://github.com/Tiemooowh/homeassistant-teletask) and jan-bogaerts (https://github.com/jan-bogaerts/teletask_bridge)
 Didn't want the MQTT middleware, wanted more than the integration of Tiemooowh offered and did not want any dependencies.
-So started from scratch with the help of CoPilot
+So started from scratch with the help of Copilot
 
 ## Features
 Following Teletask items can be controlled or monitored

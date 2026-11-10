@@ -21,6 +21,7 @@ TT_FUNCTIONS = {
     "dimmer": FNC_DIMMER,
     "locmood": FNC_LOCMOOD,
     "genmood": FNC_GENMOOD,
+    "timemood": FNC_TIMEDMOOD,
     "flag": FNC_FLAG,
     "sensor": FNC_SENSOR,
     "cond": FNC_COND,
